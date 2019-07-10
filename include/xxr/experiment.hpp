@@ -30,6 +30,8 @@ namespace xxr {
 
         virtual std::size_t populationSize() const = 0;
 
+        virtual std::size_t numerositySum() const = 0;
+
         virtual void switchToCondensationMode() noexcept = 0;
     };
 

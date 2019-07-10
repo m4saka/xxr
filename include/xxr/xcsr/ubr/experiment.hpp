@@ -146,6 +146,7 @@ namespace xxr { namespace xcsr_impl { namespace ubr
         }
 
         using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::populationSize;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::numerositySum;
     };
 
 }}}

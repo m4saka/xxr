@@ -92,6 +92,11 @@ namespace xxr { namespace xcsr_impl
             return m_experiment->populationSize();
         }
 
+        virtual std::size_t numerositySum() const override
+        {
+            return m_experiment->numerositySum();
+        }
+
         virtual void switchToCondensationMode() noexcept override
         {
             m_experiment->switchToCondensationMode();

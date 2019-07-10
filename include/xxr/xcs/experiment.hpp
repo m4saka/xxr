@@ -336,6 +336,16 @@ namespace xxr { namespace xcs_impl
             return m_population.size();
         }
 
+        virtual std::size_t numerositySum() const override
+        {
+            uint64_t sum = 0;
+            for (auto && cl : m_population)
+            {
+                sum += cl->numerosity;
+            }
+            return sum;
+        }
+
         virtual void switchToCondensationMode() noexcept override
         {
             constants.chi = 0.0;
