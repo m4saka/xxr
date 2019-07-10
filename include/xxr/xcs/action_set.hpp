@@ -139,7 +139,7 @@ namespace xxr { namespace xcs_impl
             {
                 averageTimeStamp += cl->timeStamp / numerositySum * cl->numerosity;
             }
-            assert(averageTimeStamp <= timeStamp + 1);
+            assert(averageTimeStamp < timeStamp + 1);
 
             if (timeStamp - averageTimeStamp >= m_constants.thetaGA)
             {
