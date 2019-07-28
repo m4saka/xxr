@@ -118,18 +118,22 @@ namespace xxr { namespace xcs_impl
 
         std::vector<T> m_prevSituation;
 
+        // Prediction value of the previous action decision (just for logging)
+        double m_prediction;
+
     public:
         // Constructor
-        Experiment(const std::unordered_set<Action> & availableActions, const ConstantsType & constants) :
-            constants(constants),
-            m_population(this->constants, availableActions),
-            m_actionSet(this->constants, availableActions),
-            m_prevActionSet(this->constants, availableActions),
-            m_availableActions(availableActions),
-            m_timeStamp(0),
-            m_expectsReward(false),
-            m_prevReward(0.0),
-            m_isPrevModeExplore(false)
+        Experiment(const std::unordered_set<Action> & availableActions, const ConstantsType & constants)
+            : constants(constants)
+            , m_population(this->constants, availableActions)
+            , m_actionSet(this->constants, availableActions)
+            , m_prevActionSet(this->constants, availableActions)
+            , m_availableActions(availableActions)
+            , m_timeStamp(0)
+            , m_expectsReward(false)
+            , m_prevReward(0.0)
+            , m_isPrevModeExplore(false)
+            , m_prediction(0.0)
         {
         }
 
@@ -149,6 +153,7 @@ namespace xxr { namespace xcs_impl
             const PredictionArray predictionArray(matchSet, constants.exploreProbability);
 
             const Action action = predictionArray.selectAction();
+            m_prediction = predictionArray.predictionFor(action);
 
             m_actionSet.regenerate(matchSet, action);
 
@@ -243,13 +248,23 @@ namespace xxr { namespace xcs_impl
                 if (!matchSet.empty())
                 {
                     GreedyPredictionArray<MatchSetType> predictionArray(matchSet);
-                    return predictionArray.selectAction();
+                    const Action action = predictionArray.selectAction();
+                    m_prediction = predictionArray.predictionFor(action);
+                    return action;
                 }
                 else
                 {
+                    m_prediction = constants.initialPrediction;
                     return Random::chooseFrom(m_availableActions);
                 }
             }
+        }
+
+        // Get prediction value of the previous action decision
+        // (Call this function after explore() or exploit())
+        virtual double prediction() const
+        {
+            return m_prediction;
         }
 
         virtual std::vector<ClassifierType> getMatchingClassifiers(const std::vector<T> & situation) const
