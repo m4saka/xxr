@@ -71,6 +71,13 @@ namespace xxr { namespace xcsr_impl
             return m_experiment->exploit(situation, update);
         }
 
+        // Get prediction value of the previous action decision
+        // (Call this function after explore() or exploit())
+        virtual double prediction() const
+        {
+            return m_experiment->prediction();
+        }
+
         virtual void loadPopulationCSV(const std::string & filename, bool useAsInitialPopulation = true) override
         {
             m_experiment->loadPopulationCSV(filename, useAsInitialPopulation);

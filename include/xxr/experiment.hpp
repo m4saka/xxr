@@ -24,6 +24,8 @@ namespace xxr {
         // (Set update to true when testing multi-step problems. If update is true, make sure to call reward() after this.)
         virtual Action exploit(const std::vector<T> & situation, bool update = false) = 0;
 
+        virtual double prediction() const = 0;
+
         virtual void loadPopulationCSV(const std::string & filename, bool useAsInitialPopulation = true) = 0;
 
         virtual void dumpPopulation(std::ostream & os) const = 0;

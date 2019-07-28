@@ -27,6 +27,9 @@ struct ExperimentSettings
     // The filename of macro-classifier count log csv output
     std::string outputPopulationSizeFilename = "num.csv";
 
+    // The filename of system error log csv output
+    std::string outputSystemErrorFilename = "syserr.csv";
+
     // The filename of number-of-step log csv output in the multi-step problem
     std::string outputStepCountFilename;
 

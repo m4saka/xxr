@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <cstdio>
 #include <cstddef>
+#include <cmath>
 #include "../environment/environment.hpp"
 #include "experiment_settings.hpp"
 #include "experiment_log_stream.hpp"
@@ -37,9 +38,11 @@ namespace xxr
         std::function<void(Environment &)> m_explorationCallback;
         std::function<void(Environment &)> m_exploitationCallback;
         SMAExperimentLogStream m_rewardLogStream;
+        SMAExperimentLogStream m_systemErrorLogStream;
         SMAExperimentLogStream m_stepCountLogStream;
         ExperimentLogStream m_populationSizeLogStream;
         double m_summaryRewardSum;
+        double m_summarySystemErrorSum;
         double m_summaryPopulationSizeSum;
         double m_summaryStepCountSum;
         std::size_t m_iterationCount;
@@ -88,9 +91,11 @@ namespace xxr
             , m_explorationCallback(std::move(explorationCallback))
             , m_exploitationCallback(std::move(exploitationCallback))
             , m_rewardLogStream(settings.outputFilenamePrefix + settings.outputRewardFilename, settings.smaWidth)
+            , m_systemErrorLogStream(settings.outputFilenamePrefix + settings.outputSystemErrorFilename, settings.smaWidth, false)
             , m_stepCountLogStream(settings.outputFilenamePrefix + settings.outputStepCountFilename, settings.smaWidth, false)
             , m_populationSizeLogStream(settings.outputFilenamePrefix + settings.outputPopulationSizeFilename, false)
             , m_summaryRewardSum(0.0)
+            , m_summarySystemErrorSum(0.0)
             , m_summaryPopulationSizeSum(0.0)
             , m_summaryStepCountSum(0.0)
             , m_iterationCount(0)
@@ -114,7 +119,8 @@ namespace xxr
                 if (m_settings.exploitationCount > 0)
                 {
                     std::size_t totalStepCount = 0;
-                    double rewardSum = 0;
+                    double rewardSum = 0.0;
+                    double systemErrorSum = 0.0;
                     double populationSizeSum = 0.0;
                     for (std::size_t j = 0; j < m_settings.seedCount; ++j)
                     {
@@ -128,12 +134,13 @@ namespace xxr
                                 // Get reward
                                 double reward = m_exploitationEnvironments[j]->executeAction(action);
                                 m_summaryRewardSum += reward / m_settings.exploitationCount / m_settings.seedCount;
+                                m_summarySystemErrorSum += std::abs(reward - m_experiments[j]->prediction()) / m_settings.exploitationCount / m_settings.seedCount;
                                 if (m_settings.updateInExploitation)
                                 {
                                     m_experiments[j]->reward(reward, m_exploitationEnvironments[j]->isEndOfProblem());
                                 }
                                 rewardSum += reward;
-
+                                systemErrorSum += std::abs(reward - m_experiments[j]->prediction());
                                 ++totalStepCount;
 
                                 // Run callback if needed
@@ -149,18 +156,21 @@ namespace xxr
 
                     if (m_settings.summaryInterval > 0 && (m_iterationCount + 1) % m_settings.summaryInterval == 0)
                     {
-                        std::printf("%9u %11.3f %10.3f %8.3f\n",
+                        std::printf("%9u %11.3f %11.3f %10.3f %8.3f\n",
                             static_cast<unsigned int>(m_iterationCount + 1),
                             m_summaryRewardSum / m_settings.summaryInterval,
+                            m_summarySystemErrorSum / m_settings.summaryInterval,
                             m_summaryPopulationSizeSum / m_settings.summaryInterval,
                             m_summaryStepCountSum / m_settings.summaryInterval);
                         std::fflush(stdout);
                         m_summaryRewardSum = 0.0;
+                        m_summarySystemErrorSum = 0.0;
                         m_summaryPopulationSizeSum = 0.0;
                         m_summaryStepCountSum = 0.0;
                     }
 
                     m_rewardLogStream.writeLine(rewardSum / m_settings.exploitationCount / m_settings.seedCount);
+                    m_systemErrorLogStream.writeLine(systemErrorSum / m_settings.exploitationCount / m_settings.seedCount);
                     m_populationSizeLogStream.writeLine(populationSizeSum / m_settings.exploitationCount / m_settings.seedCount);
                     m_stepCountLogStream.writeLine(static_cast<double>(totalStepCount) / m_settings.exploitationCount / m_settings.seedCount);
                 }
