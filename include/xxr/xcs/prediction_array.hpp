@@ -89,6 +89,11 @@ namespace xxr { namespace xcs_impl
             return m_maxPA;
         }
 
+        virtual double predictionFor(ActionType action) const
+        {
+            return m_pa.at(action);
+        }
+
         // SELECT ACTION
         virtual ActionType selectAction() const = 0;
     };
