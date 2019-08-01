@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
         .allow_unrecognised_options()
         .add_options()
         ("summary-interval", "The iteration interval of summary log output", cxxopts::value<uint64_t>()->default_value("5000"), "COUNT")
+        ("p,prefix", "The filename prefix for log file output", cxxopts::value<std::string>()->default_value(""), "PREFIX")
         ("S,soutput", "The filename of summary log csv output", cxxopts::value<std::string>()->default_value("summary.csv"), "FILENAME")
         ("o,coutput", "The filename of classifier csv output", cxxopts::value<std::string>()->default_value("classifier.csv"), "FILENAME")
         ("r,routput", "The filename of reward log csv output", cxxopts::value<std::string>()->default_value("reward.csv"), "FILENAME")
@@ -236,6 +237,7 @@ int main(int argc, char *argv[])
     settings.exploitationCount = result["exploit"].as<uint64_t>();
     settings.updateInExploitation = updateInExploitation;
     settings.summaryInterval = result["summary-interval"].as<uint64_t>();
+    settings.outputFilenamePrefix = result["prefix"].as<std::string>();
     settings.outputSummaryToStdout = true;
     settings.outputSummaryFilename = result["soutput"].as<std::string>();
     settings.outputRewardFilename = result["routput"].as<std::string>();
