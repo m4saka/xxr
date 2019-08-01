@@ -24,9 +24,10 @@ int main(int argc, char *argv[])
         .allow_unrecognised_options()
         .add_options()
         ("summary-interval", "The iteration interval of summary log output", cxxopts::value<uint64_t>()->default_value("5000"), "COUNT")
+        ("S,soutput", "The filename of summary log csv output", cxxopts::value<std::string>()->default_value("summary.csv"), "FILENAME")
         ("o,coutput", "The filename of classifier csv output", cxxopts::value<std::string>()->default_value("classifier.csv"), "FILENAME")
         ("r,routput", "The filename of reward log csv output", cxxopts::value<std::string>()->default_value("reward.csv"), "FILENAME")
-        ("S,seoutput", "The filename of system error log csv output", cxxopts::value<std::string>()->default_value("syserr.csv"), "FILENAME")
+        ("E,seoutput", "The filename of system error log csv output", cxxopts::value<std::string>()->default_value("syserr.csv"), "FILENAME")
         ("n,noutput", "The filename of macro-classifier count log csv output", cxxopts::value<std::string>()->default_value("num.csv"), "FILENAME")
         //("nsoutput", "The filename of number-of-step log csv output in the multi-step problem", cxxopts::value<std::string>()->default_value(""), "FILENAME")
         ("cinput", "The classifier csv filename for initial population", cxxopts::value<std::string>()->default_value(""), "FILENAME")
@@ -257,6 +258,8 @@ int main(int argc, char *argv[])
     settings.exploitationCount = result["exploit"].as<uint64_t>();
     settings.updateInExploitation = updateInExploitation;
     settings.summaryInterval = result["summary-interval"].as<uint64_t>();
+    settings.outputSummaryToStdout = true;
+    settings.outputSummaryFilename = result["soutput"].as<std::string>();
     settings.outputRewardFilename = result["routput"].as<std::string>();
     settings.outputSystemErrorFilename = result["seoutput"].as<std::string>();
     settings.outputPopulationSizeFilename = result["noutput"].as<std::string>();
