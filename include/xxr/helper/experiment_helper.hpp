@@ -44,6 +44,7 @@ namespace xxr
         SMAExperimentLogStream m_systemErrorLogStream;
         SMAExperimentLogStream m_stepCountLogStream;
         ExperimentLogStream m_populationSizeLogStream;
+        bool m_alreadyOutputSummaryHeader;
         double m_summaryRewardSum;
         double m_summarySystemErrorSum;
         double m_summaryPopulationSizeSum;
@@ -98,6 +99,7 @@ namespace xxr
             , m_systemErrorLogStream(settings.outputFilenamePrefix + settings.outputSystemErrorFilename, settings.smaWidth, false)
             , m_stepCountLogStream(settings.outputFilenamePrefix + settings.outputStepCountFilename, settings.smaWidth, false)
             , m_populationSizeLogStream(settings.outputFilenamePrefix + settings.outputPopulationSizeFilename, false)
+            , m_alreadyOutputSummaryHeader(false)
             , m_summaryRewardSum(0.0)
             , m_summarySystemErrorSum(0.0)
             , m_summaryPopulationSizeSum(0.0)
@@ -160,9 +162,23 @@ namespace xxr
 
                     if (m_settings.summaryInterval > 0 && (m_iterationCount + 1) % m_settings.summaryInterval == 0)
                     {
+                        if (!m_alreadyOutputSummaryHeader)
+                        {
+                            if (m_settings.outputSummaryToStdout)
+                            {
+                                std::cout
+                                    << "  Iteration      Reward      SysErr     PopSize   TotalStep\n"
+                                    << " ========== =========== =========== =========== ===========" << std::endl;
+                            }
+                            if (m_summaryLogStream)
+                            {
+                                m_summaryLogStream << "Iteration,Reward,SysErr,PopSize,TotalStep" << std::endl;
+                            }
+                            m_alreadyOutputSummaryHeader = true;
+                        }
                         if (m_settings.outputSummaryToStdout)
                         {
-                            std::printf("%9u %11.3f %11.3f %11.3f %11.3f\n",
+                            std::printf("%11u %11.3f %11.3f %11.3f %11.3f\n",
                                 static_cast<unsigned int>(m_iterationCount + 1),
                                 m_summaryRewardSum / m_settings.summaryInterval,
                                 m_summarySystemErrorSum / m_settings.summaryInterval,
