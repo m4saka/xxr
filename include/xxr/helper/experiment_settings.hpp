@@ -21,6 +21,12 @@ struct ExperimentSettings
     // The prefix of filename
     std::string outputFilenamePrefix;
 
+    // Whether to output summary log to stdout
+    bool outputSummaryToStdout = false;
+
+    // The filename of summary log csv output
+    std::string outputSummaryFilename = "summary.csv";
+
     // The filename of reward log csv output
     std::string outputRewardFilename = "reward.csv";
 

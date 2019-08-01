@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <functional>
 #include <unordered_set>
@@ -37,6 +38,8 @@ namespace xxr
         std::vector<std::unique_ptr<Environment>> m_exploitationEnvironments;
         std::function<void(Environment &)> m_explorationCallback;
         std::function<void(Environment &)> m_exploitationCallback;
+        std::ofstream m_summaryLogStream;
+        bool m_outputSummaryLogFile;
         SMAExperimentLogStream m_rewardLogStream;
         SMAExperimentLogStream m_systemErrorLogStream;
         SMAExperimentLogStream m_stepCountLogStream;
@@ -90,6 +93,7 @@ namespace xxr
             , m_exploitationEnvironments(std::move(exploitationEnvironments))
             , m_explorationCallback(std::move(explorationCallback))
             , m_exploitationCallback(std::move(exploitationCallback))
+            , m_summaryLogStream(settings.outputFilenamePrefix + settings.outputSummaryFilename)
             , m_rewardLogStream(settings.outputFilenamePrefix + settings.outputRewardFilename, settings.smaWidth)
             , m_systemErrorLogStream(settings.outputFilenamePrefix + settings.outputSystemErrorFilename, settings.smaWidth, false)
             , m_stepCountLogStream(settings.outputFilenamePrefix + settings.outputStepCountFilename, settings.smaWidth, false)
@@ -156,13 +160,25 @@ namespace xxr
 
                     if (m_settings.summaryInterval > 0 && (m_iterationCount + 1) % m_settings.summaryInterval == 0)
                     {
-                        std::printf("%9u %11.3f %11.3f %10.3f %8.3f\n",
-                            static_cast<unsigned int>(m_iterationCount + 1),
-                            m_summaryRewardSum / m_settings.summaryInterval,
-                            m_summarySystemErrorSum / m_settings.summaryInterval,
-                            m_summaryPopulationSizeSum / m_settings.summaryInterval,
-                            m_summaryStepCountSum / m_settings.summaryInterval);
-                        std::fflush(stdout);
+                        if (m_settings.outputSummaryToStdout)
+                        {
+                            std::printf("%9u %11.3f %11.3f %11.3f %11.3f\n",
+                                static_cast<unsigned int>(m_iterationCount + 1),
+                                m_summaryRewardSum / m_settings.summaryInterval,
+                                m_summarySystemErrorSum / m_settings.summaryInterval,
+                                m_summaryPopulationSizeSum / m_settings.summaryInterval,
+                                m_summaryStepCountSum / m_settings.summaryInterval);
+                            std::fflush(stdout);
+                        }
+                        if (m_summaryLogStream)
+                        {
+                            m_summaryLogStream
+                                << (m_iterationCount + 1) << ','
+                                << m_summaryRewardSum / m_settings.summaryInterval << ','
+                                << m_summarySystemErrorSum / m_settings.summaryInterval << ','
+                                << m_summaryPopulationSizeSum / m_settings.summaryInterval << ','
+                                << m_summaryStepCountSum / m_settings.summaryInterval << std::endl;
+                        }
                         m_summaryRewardSum = 0.0;
                         m_summarySystemErrorSum = 0.0;
                         m_summaryPopulationSizeSum = 0.0;

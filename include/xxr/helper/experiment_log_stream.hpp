@@ -17,10 +17,10 @@ namespace xxr
         std::ostream & m_os;
 
     public:
-        explicit ExperimentLogStream(const std::string & filename = "", bool useCoutWhenEmpty = true)
+        explicit ExperimentLogStream(const std::string & filename = "", bool useStdoutWhenEmpty = true)
             : m_os(
                 filename.empty()
-                    ? (useCoutWhenEmpty ? std::cout : m_ofs)
+                    ? (useStdoutWhenEmpty ? std::cout : m_ofs)
                     : m_ofs)
         {
             m_ofs.open(filename);
@@ -68,8 +68,8 @@ namespace xxr
         std::size_t m_count;
 
     public:
-        explicit SMAExperimentLogStream(const std::string & filename = "", std::size_t smaWidth = 1, bool useCoutWhenEmpty = true)
-            : ExperimentLogStream(filename, useCoutWhenEmpty)
+        explicit SMAExperimentLogStream(const std::string & filename = "", std::size_t smaWidth = 1, bool useStdoutWhenEmpty = true)
+            : ExperimentLogStream(filename, useStdoutWhenEmpty)
             , m_sma(smaWidth)
         {
         }
