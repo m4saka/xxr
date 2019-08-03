@@ -71,6 +71,7 @@ namespace xxr
         explicit SMAExperimentLogStream(const std::string & filename = "", std::size_t smaWidth = 1, bool useStdoutWhenEmpty = true)
             : ExperimentLogStream(filename, useStdoutWhenEmpty)
             , m_sma(smaWidth)
+            , m_count(0)
         {
         }
 
