@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
 
     // Save population
     {
-        std::string filename = result["coutput"].as<std::string>();
+        std::string filename = settings.outputFilenamePrefix + result["coutput"].as<std::string>();
 
         std::ofstream ofs;
         std::ostream & os = filename.empty() ? std::cout : ofs;
