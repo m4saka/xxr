@@ -36,12 +36,12 @@ namespace xxr
 
     public:
         // Constructor
-        explicit MultiplexerEnvironment(std::size_t length) :
-            AbstractEnvironment<bool, bool>({ false, true }),
-            m_totalLength(length),
-            m_addressBitLength(addressBitLength(length, 0)),
-            m_situation(randomSituation(length)),
-            m_isEndOfProblem(false)
+        explicit MultiplexerEnvironment(std::size_t length)
+            : AbstractEnvironment<bool, bool>({ false, true })
+            , m_totalLength(length)
+            , m_addressBitLength(addressBitLength(length, 0))
+            , m_situation(randomSituation(length))
+            , m_isEndOfProblem(false)
         {
             // Total length must be n + 2^n (n > 0)
             assert(m_totalLength == (m_addressBitLength + ((std::size_t)1 << m_addressBitLength)));
