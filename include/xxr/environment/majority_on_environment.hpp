@@ -67,10 +67,10 @@ namespace xxr
         // Returns answer to situation
         bool getAnswer() const
         {
-            int sum = 0;
+            std::size_t sum = 0;
             for (bool b : m_situation)
             {
-                sum += static_cast<int>(b);
+                sum += static_cast<std::size_t>(b);
             }
             return sum > m_length / 2;
         }

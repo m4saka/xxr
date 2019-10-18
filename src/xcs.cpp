@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
         ("resume", "Whether to use initial classifiers (--cinput) to resume previous experiment (\"false\": initialize p/epsilon/F/exp/ts/as to defaults, \"true\": do not initialize values and set system time stamp to the same as that of the latest classifier)", cxxopts::value<bool>()->default_value("false"), "true/false")
         ("m,mux", "Use the multiplexer problem", cxxopts::value<int>(), "LENGTH")
         ("parity", "Use the even-parity problem", cxxopts::value<int>(), "LENGTH")
+        ("majority", "Use the majority-on problem", cxxopts::value<int>(), "LENGTH")
         ("blc", "Use the block world problem", cxxopts::value<std::string>(), "FILENAME")
         ("blc-3bit", "Use 3-bit representation for each block in a situation", cxxopts::value<bool>()->default_value("false"), "true/false")
         ("blc-diag", "Allow diagonal actions in the block world problem", cxxopts::value<bool>()->default_value("true"), "true/false")
@@ -129,7 +130,7 @@ int main(int argc, char *argv[])
     if (result.count("mam"))
         constants.useMAM = result["mam"].as<bool>();
 
-    bool isEnvironmentSpecified = (result.count("mux") || result.count("parity") || result.count("blc") || result.count("csv"));
+    bool isEnvironmentSpecified = (result.count("mux") || result.count("parity") || result.count("majority") || result.count("blc") || result.count("csv"));
 
     // Determine crossover method
     if (result["x-method"].as<std::string>() == "uniform")
@@ -282,6 +283,25 @@ int main(int argc, char *argv[])
         }
 
         experimentHelper = std::make_unique<ExperimentHelper<XCS<bool, bool>, EvenParityEnvironment>>(
+            settings,
+            constants,
+            std::move(explorationEnvironments),
+            std::move(exploitationEnvironments)
+        );
+    }
+
+    // Use majority-on problem
+    if (result.count("majority"))
+    {
+        std::vector<std::unique_ptr<MajorityOnEnvironment>> explorationEnvironments;
+        std::vector<std::unique_ptr<MajorityOnEnvironment>> exploitationEnvironments;
+        for (std::size_t i = 0; i < settings.seedCount; ++i)
+        {
+            explorationEnvironments.push_back(std::make_unique<MajorityOnEnvironment>(result["majority"].as<int>()));
+            exploitationEnvironments.push_back(std::make_unique<MajorityOnEnvironment>(result["majority"].as<int>()));
+        }
+
+        experimentHelper = std::make_unique<ExperimentHelper<XCS<bool, bool>, MajorityOnEnvironment>>(
             settings,
             constants,
             std::move(explorationEnvironments),
