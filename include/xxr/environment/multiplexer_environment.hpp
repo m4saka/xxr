@@ -27,6 +27,7 @@ namespace xxr
         static std::vector<bool> randomSituation(std::size_t totalLength)
         {
             std::vector<bool> situation;
+            situation.reserve(totalLength);
             for (std::size_t i = 0; i < totalLength; ++i)
             {
                 situation.push_back(Random::nextInt(0, 1));
@@ -47,7 +48,7 @@ namespace xxr
             assert(m_totalLength == (m_addressBitLength + ((std::size_t)1 << m_addressBitLength)));
         }
 
-        ~MultiplexerEnvironment() = default;
+        virtual ~MultiplexerEnvironment() = default;
 
         virtual std::vector<bool> situation() const override
         {
