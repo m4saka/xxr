@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
         ("cinput", "The classifier csv filename for initial population", cxxopts::value<std::string>()->default_value(""), "FILENAME")
         ("resume", "Whether to use initial classifiers (--cinput) to resume previous experiment (\"false\": initialize p/epsilon/F/exp/ts/as to defaults, \"true\": do not initialize values and set system time stamp to the same as that of the latest classifier)", cxxopts::value<bool>()->default_value("false"), "true/false")
         ("m,mux", "Use the multiplexer problem", cxxopts::value<int>(), "LENGTH")
+        ("mux-i", "Class imbalance level i of the multiplexer problem (used only in exploration)", cxxopts::value<unsigned int>()->default_value("0"), "LEVEL")
         ("blc", "Use the block world problem", cxxopts::value<std::string>(), "FILENAME")
         ("blc-3bit", "Use 3-bit representation for each block in a situation", cxxopts::value<bool>()->default_value("false"), "true/false")
         ("blc-diag", "Allow diagonal actions in the block world problem", cxxopts::value<bool>()->default_value("true"), "true/false")
@@ -257,7 +258,7 @@ int main(int argc, char *argv[])
         std::vector<std::unique_ptr<MultiplexerEnvironment>> exploitationEnvironments;
         for (std::size_t i = 0; i < settings.seedCount; ++i)
         {
-            explorationEnvironments.push_back(std::make_unique<MultiplexerEnvironment>(result["mux"].as<int>()));
+            explorationEnvironments.push_back(std::make_unique<MultiplexerEnvironment>(result["mux"].as<int>(), result["mux-i"].as<unsigned int>()));
             exploitationEnvironments.push_back(std::make_unique<MultiplexerEnvironment>(result["mux"].as<int>()));
         }
 
