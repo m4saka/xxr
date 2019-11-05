@@ -44,6 +44,8 @@ namespace xxr
         static std::vector<bool> randomSituation(std::size_t totalLength, double minorityAcceptanceProbability = 1.0)
         {
             std::vector<bool> situation;
+            situation.reserve(totalLength);
+
             while (true)
             {
                 for (std::size_t i = 0; i < totalLength; ++i)

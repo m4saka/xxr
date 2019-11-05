@@ -34,7 +34,10 @@ int main(int argc, char *argv[])
         ("cinput", "The classifier csv filename for initial population", cxxopts::value<std::string>()->default_value(""), "FILENAME")
         ("resume", "Whether to use initial classifiers (--cinput) to resume previous experiment (\"false\": initialize p/epsilon/F/exp/ts/as to defaults, \"true\": do not initialize values and set system time stamp to the same as that of the latest classifier)", cxxopts::value<bool>()->default_value("false"), "true/false")
         ("m,mux", "Use the multiplexer problem", cxxopts::value<int>(), "LENGTH")
+<<<<<<< HEAD
         ("mux-i", "Class imbalance level i of the multiplexer problem (used only in exploration)", cxxopts::value<unsigned int>()->default_value("0"), "LEVEL")
+=======
+>>>>>>> master
         ("parity", "Use the even-parity problem", cxxopts::value<int>(), "LENGTH")
         ("majority", "Use the majority-on problem", cxxopts::value<int>(), "LENGTH")
         ("blc", "Use the block world problem", cxxopts::value<std::string>(), "FILENAME")
@@ -131,7 +134,7 @@ int main(int argc, char *argv[])
     if (result.count("mam"))
         constants.useMAM = result["mam"].as<bool>();
 
-    bool isEnvironmentSpecified = (result.count("mux") || result.count("blc") || result.count("csv"));
+    bool isEnvironmentSpecified = (result.count("mux") || result.count("parity") || result.count("majority") || result.count("blc") || result.count("csv"));
 
     // Determine crossover method
     if (result["x-method"].as<std::string>() == "uniform")
@@ -272,6 +275,44 @@ int main(int argc, char *argv[])
         );
     }
 
+    // Use even-parity problem
+    if (result.count("parity"))
+    {
+        std::vector<std::unique_ptr<EvenParityEnvironment>> explorationEnvironments;
+        std::vector<std::unique_ptr<EvenParityEnvironment>> exploitationEnvironments;
+        for (std::size_t i = 0; i < settings.seedCount; ++i)
+        {
+            explorationEnvironments.push_back(std::make_unique<EvenParityEnvironment>(result["parity"].as<int>()));
+            exploitationEnvironments.push_back(std::make_unique<EvenParityEnvironment>(result["parity"].as<int>()));
+        }
+
+        experimentHelper = std::make_unique<ExperimentHelper<XCS<bool, bool>, EvenParityEnvironment>>(
+            settings,
+            constants,
+            std::move(explorationEnvironments),
+            std::move(exploitationEnvironments)
+        );
+    }
+
+    // Use majority-on problem
+    if (result.count("majority"))
+    {
+        std::vector<std::unique_ptr<MajorityOnEnvironment>> explorationEnvironments;
+        std::vector<std::unique_ptr<MajorityOnEnvironment>> exploitationEnvironments;
+        for (std::size_t i = 0; i < settings.seedCount; ++i)
+        {
+            explorationEnvironments.push_back(std::make_unique<MajorityOnEnvironment>(result["majority"].as<int>()));
+            exploitationEnvironments.push_back(std::make_unique<MajorityOnEnvironment>(result["majority"].as<int>()));
+        }
+
+        experimentHelper = std::make_unique<ExperimentHelper<XCS<bool, bool>, MajorityOnEnvironment>>(
+            settings,
+            constants,
+            std::move(explorationEnvironments),
+            std::move(exploitationEnvironments)
+        );
+    }
+
     // Use block world problem
     std::ofstream blockWorldTraceLogStream;
     if (result.count("blc"))
@@ -397,7 +438,7 @@ int main(int argc, char *argv[])
 
     // Save population
     {
-        std::string filename = result["coutput"].as<std::string>();
+        std::string filename = settings.outputFilenamePrefix + result["coutput"].as<std::string>();
 
         std::ofstream ofs;
         std::ostream & os = filename.empty() ? std::cout : ofs;

@@ -7,6 +7,7 @@ template <typename T>
 class AbstractFilter
 {
 public:
+    virtual ~AbstractFilter() = default;
     virtual T operator()(T value) = 0;
 };
 
