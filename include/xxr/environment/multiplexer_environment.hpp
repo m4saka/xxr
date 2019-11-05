@@ -59,6 +59,10 @@ namespace xxr
                 {
                     break;
                 }
+                else
+                {
+                    situation.clear();
+                }
             }
             return situation;
         }
