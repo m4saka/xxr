@@ -121,6 +121,9 @@ namespace xxr { namespace xcs_impl
         // Prediction value of the previous action decision (just for logging)
         double m_prediction;
 
+        // Covering occurrence of the previous action decision (just for logging)
+        bool m_isCoveringPerformed;
+
     public:
         // Constructor
         Experiment(const std::unordered_set<Action> & availableActions, const ConstantsType & constants)
@@ -134,6 +137,7 @@ namespace xxr { namespace xcs_impl
             , m_prevReward(0.0)
             , m_isPrevModeExplore(false)
             , m_prediction(0.0)
+            , m_isCoveringPerformed(false)
         {
         }
 
@@ -149,6 +153,7 @@ namespace xxr { namespace xcs_impl
             //   The match set [M] is formed out of the current [P].
             //   It includes all classifiers that match the current situation.
             const MatchSetType matchSet(m_population, situation, m_timeStamp, this->constants, m_availableActions);
+            m_isCoveringPerformed = matchSet.isCoveringPerformed();
 
             const PredictionArray predictionArray(matchSet, constants.exploreProbability);
 
@@ -211,6 +216,7 @@ namespace xxr { namespace xcs_impl
                 //   The match set [M] is formed out of the current [P].
                 //   It includes all classifiers that match the current situation.
                 const MatchSetType matchSet(m_population, situation, m_timeStamp, this->constants, m_availableActions);
+                m_isCoveringPerformed = matchSet.isCoveringPerformed();
 
                 const GreedyPredictionArray<MatchSetType> predictionArray(matchSet);
 
@@ -247,6 +253,8 @@ namespace xxr { namespace xcs_impl
 
                 if (!matchSet.empty())
                 {
+                    m_isCoveringPerformed = false;
+
                     GreedyPredictionArray<MatchSetType> predictionArray(matchSet);
                     const Action action = predictionArray.selectAction();
                     m_prediction = predictionArray.predictionFor(action);
@@ -254,6 +262,7 @@ namespace xxr { namespace xcs_impl
                 }
                 else
                 {
+                    m_isCoveringPerformed = true;
                     m_prediction = constants.initialPrediction;
                     return Random::chooseFrom(m_availableActions);
                 }
@@ -265,6 +274,13 @@ namespace xxr { namespace xcs_impl
         virtual double prediction() const
         {
             return m_prediction;
+        }
+
+        // Get if covering is performed in the previous action decision
+        // (Call this function after explore() or exploit())
+        virtual bool isCoveringPerformed() const
+        {
+            return m_isCoveringPerformed;
         }
 
         virtual std::vector<ClassifierType> getMatchingClassifiers(const std::vector<T> & situation) const

@@ -28,6 +28,8 @@ namespace xxr { namespace xcs_impl
         using Population::ClassifierPtrSetType::m_availableActions;
         using Population::ClassifierPtrSetType::m_set;
 
+        bool m_isCoveringPerformed;
+
         // GENERATE COVERING CLASSIFIER
         virtual ClassifierPtr generateCoveringClassifier(const std::vector<type> & situation, const std::unordered_set<ActionType> & unselectedActions, uint64_t timeStamp) const
         {
@@ -43,6 +45,7 @@ namespace xxr { namespace xcs_impl
 
         MatchSet(Population & population, const std::vector<type> & situation, uint64_t timeStamp, ConstantsType & constants, const std::unordered_set<ActionType> & availableActions)
             : ClassifierPtrSetType(constants, availableActions)
+            , m_isCoveringPerformed(false)
         {
             regenerate(population, situation, timeStamp);
         }
@@ -90,8 +93,20 @@ namespace xxr { namespace xcs_impl
                     population.insert(coveringClassifier);
                     population.deleteExtraClassifiers();
                     m_set.clear();
+                    m_isCoveringPerformed = true;
+                }
+                else
+                {
+                    m_isCoveringPerformed = false;
                 }
             }
+        }
+
+        // Get if covering is performed in the previous match set generation
+        // (Call this function after constructor or regenerate())
+        virtual bool isCoveringPerformed() const
+        {
+            return m_isCoveringPerformed;
         }
     };
 

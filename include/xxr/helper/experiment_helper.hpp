@@ -48,6 +48,7 @@ namespace xxr
         double m_summaryRewardSum;
         double m_summarySystemErrorSum;
         double m_summaryPopulationSizeSum;
+        double m_summaryCoveringOccurrenceRateSum;
         double m_summaryStepCountSum;
         std::size_t m_iterationCount;
 
@@ -103,6 +104,7 @@ namespace xxr
             , m_summaryRewardSum(0.0)
             , m_summarySystemErrorSum(0.0)
             , m_summaryPopulationSizeSum(0.0)
+            , m_summaryCoveringOccurrenceRateSum(0.0)
             , m_summaryStepCountSum(0.0)
             , m_iterationCount(0)
         {
@@ -141,6 +143,7 @@ namespace xxr
                                 double reward = m_exploitationEnvironments[j]->executeAction(action);
                                 m_summaryRewardSum += reward / m_settings.exploitationCount / m_settings.seedCount;
                                 m_summarySystemErrorSum += std::abs(reward - m_experiments[j]->prediction()) / m_settings.exploitationCount / m_settings.seedCount;
+                                m_summaryCoveringOccurrenceRateSum += static_cast<double>(m_experiments[j]->isCoveringPerformed()) / m_settings.exploitationCount / m_settings.seedCount;
                                 if (m_settings.updateInExploitation)
                                 {
                                     m_experiments[j]->reward(reward, m_exploitationEnvironments[j]->isEndOfProblem());
@@ -167,22 +170,23 @@ namespace xxr
                             if (m_settings.outputSummaryToStdout)
                             {
                                 std::cout
-                                    << "  Iteration      Reward      SysErr     PopSize   TotalStep\n"
-                                    << " ========== =========== =========== =========== ===========" << std::endl;
+                                    << "  Iteration      Reward      SysErr     PopSize  CovOccRate   TotalStep\n"
+                                    << " ========== =========== =========== =========== =========== ===========" << std::endl;
                             }
                             if (m_summaryLogStream)
                             {
-                                m_summaryLogStream << "Iteration,Reward,SysErr,PopSize,TotalStep" << std::endl;
+                                m_summaryLogStream << "Iteration,Reward,SysErr,PopSize,CovOccRate,TotalStep" << std::endl;
                             }
                             m_alreadyOutputSummaryHeader = true;
                         }
                         if (m_settings.outputSummaryToStdout)
                         {
-                            std::printf("%11u %11.3f %11.3f %11.3f %11.3f\n",
+                            std::printf("%11u %11.3f %11.3f %11.3f  %1.8f %11.3f\n",
                                 static_cast<unsigned int>(m_iterationCount + 1),
                                 m_summaryRewardSum / m_settings.summaryInterval,
                                 m_summarySystemErrorSum / m_settings.summaryInterval,
                                 m_summaryPopulationSizeSum / m_settings.summaryInterval,
+                                m_summaryCoveringOccurrenceRateSum / m_settings.summaryInterval,
                                 m_summaryStepCountSum / m_settings.summaryInterval);
                             std::fflush(stdout);
                         }
@@ -193,11 +197,13 @@ namespace xxr
                                 << m_summaryRewardSum / m_settings.summaryInterval << ','
                                 << m_summarySystemErrorSum / m_settings.summaryInterval << ','
                                 << m_summaryPopulationSizeSum / m_settings.summaryInterval << ','
+                                << m_summaryCoveringOccurrenceRateSum / m_settings.summaryInterval << ','
                                 << m_summaryStepCountSum / m_settings.summaryInterval << std::endl;
                         }
                         m_summaryRewardSum = 0.0;
                         m_summarySystemErrorSum = 0.0;
                         m_summaryPopulationSizeSum = 0.0;
+                        m_summaryCoveringOccurrenceRateSum = 0.0;
                         m_summaryStepCountSum = 0.0;
                     }
 
