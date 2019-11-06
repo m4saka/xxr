@@ -78,6 +78,13 @@ namespace xxr { namespace xcsr_impl
             return m_experiment->prediction();
         }
 
+        // Get if covering is performed in the previous action decision
+        // (Call this function after explore() or exploit())
+        virtual bool isCoveringPerformed() const
+        {
+            return m_experiment->isCoveringPerformed();
+        }
+
         virtual void loadPopulationCSV(const std::string & filename, bool useAsInitialPopulation = true) override
         {
             m_experiment->loadPopulationCSV(filename, useAsInitialPopulation);
