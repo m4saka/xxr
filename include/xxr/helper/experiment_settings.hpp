@@ -28,13 +28,13 @@ struct ExperimentSettings
     std::string outputSummaryFilename = "summary.csv";
 
     // The filename of reward log csv output
-    std::string outputRewardFilename = "reward.csv";
+    std::string outputRewardFilename = "";
 
     // The filename of macro-classifier count log csv output
-    std::string outputPopulationSizeFilename = "num.csv";
+    std::string outputPopulationSizeFilename = "";
 
     // The filename of system error log csv output
-    std::string outputSystemErrorFilename = "syserr.csv";
+    std::string outputSystemErrorFilename = "";
 
     // The filename of number-of-step log csv output in the multi-step problem
     std::string outputStepCountFilename;
