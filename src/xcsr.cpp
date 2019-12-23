@@ -198,7 +198,6 @@ int main(int argc, char *argv[])
         std::cout << "           alpha = " << constants.alpha << std::endl;
         std::cout << "       epsilon_0 = " << constants.epsilonZero << std::endl;
         std::cout << "              nu = " << constants.nu << std::endl;
-        std::cout << "           alpha = " << constants.alpha << std::endl;
         std::cout << "           gamma = " << constants.gamma << std::endl;
         std::cout << "        theta_GA = " << constants.thetaGA << std::endl;
         std::cout << "             chi = " << constants.chi << std::endl;
