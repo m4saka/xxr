@@ -58,7 +58,8 @@ int main(int argc, char *argv[])
         ("gamma", "The discount rate in multi-step problems", cxxopts::value<double>()->default_value(std::to_string(constants.gamma)), "GAMMA")
         ("theta-ga", "The threshold for the GA application in an action set", cxxopts::value<uint64_t>()->default_value(std::to_string(constants.thetaGA)), "THETA_GA")
         ("chi", "The probability of applying crossover", cxxopts::value<double>()->default_value(std::to_string(constants.chi)), "CHI")
-        ("x-method", "The method of crossover operator", cxxopts::value<std::string>()->default_value("two-point"), "uniform/one-point/two-point")
+        ("x-method", "The method of crossover operator", cxxopts::value<std::string>()->default_value("two-point"), "uniform/one-point/two-point/blx-alpha")
+        ("blx-alpha", "The alpha parameter of BLX-alpha crossover", cxxopts::value<double>()->default_value(std::to_string(constants.blxAlpha)), "ALPHA")
         ("mu", "The probability of mutating one allele and the action", cxxopts::value<double>()->default_value(std::to_string(constants.mu)), "MU")
         ("theta-del", "The experience threshold over which the fitness of a classifier may be considered in its deletion probability", cxxopts::value<double>()->default_value(std::to_string(constants.thetaDel)), "THETA_DEL")
         ("delta", "The fraction of the mean fitness of the population below which the fitness of a classifier may be considered in its vote for deletion", cxxopts::value<double>()->default_value(std::to_string(constants.delta)), "DELTA")
@@ -141,6 +142,8 @@ int main(int argc, char *argv[])
         constants.doCoveringRandomRangeTruncation = result["do-covering-random-range-truncation"].as<bool>();
     if (result.count("mam"))
         constants.useMAM = result["mam"].as<bool>();
+    if (result.count("blx-alpha"))
+        constants.blxAlpha = result["blx-alpha"].as<double>();
 
     bool isEnvironmentSpecified = (result.count("mux") || result.count("csv") || result.count("chk"));
 
@@ -156,6 +159,10 @@ int main(int argc, char *argv[])
     else if (result["x-method"].as<std::string>() == "two-point")
     {
         constants.crossoverMethod = XCSRConstants::CrossoverMethod::TWO_POINT_CROSSOVER;
+    }
+    else if (result["x-method"].as<std::string>() == "blx-alpha")
+    {
+        constants.crossoverMethod = XCSRConstants::CrossoverMethod::BLX_ALPHA_CROSSOVER;
     }
     else
     {
@@ -226,6 +233,9 @@ int main(int argc, char *argv[])
             break;
         case XCSRConstants::CrossoverMethod::TWO_POINT_CROSSOVER:
             std::cout << "two-point" << std::endl;
+            break;
+        case XCSRConstants::CrossoverMethod::BLX_ALPHA_CROSSOVER:
+            std::cout << "BLX-alpha (alpha = " << constants.blxAlpha << ')' << std::endl;
             break;
         }
         std::cout << std::endl;

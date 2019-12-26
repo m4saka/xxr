@@ -124,17 +124,18 @@ namespace xxr { namespace xcs_impl
         {
             switch (m_constants.crossoverMethod)
             {
-            case Constants::CrossoverMethod::UNIFORM_CROSSOVER:
+            case ConstantsType::CrossoverMethod::UNIFORM_CROSSOVER:
                 return uniformCrossover(cl1, cl2);
 
-            case Constants::CrossoverMethod::ONE_POINT_CROSSOVER:
+            case ConstantsType::CrossoverMethod::ONE_POINT_CROSSOVER:
                 return onePointCrossover(cl1, cl2);
 
-            case Constants::CrossoverMethod::TWO_POINT_CROSSOVER:
+            case ConstantsType::CrossoverMethod::TWO_POINT_CROSSOVER:
                 return twoPointCrossover(cl1, cl2);
+            
+            default:
+                return false;
             }
-
-            return false;
         }
 
         // APPLY MUTATION

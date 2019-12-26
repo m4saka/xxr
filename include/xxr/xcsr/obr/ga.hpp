@@ -2,30 +2,30 @@
 
 #include <algorithm>
 
-#include "../../xcs/ga.hpp"
+#include "../ga.hpp"
 
 namespace xxr { namespace xcsr_impl { namespace obr
 {
 
     template <class Population>
-    class GA : public xcs_impl::GA<Population>
+    class GA : public xcsr_impl::GA<Population>
     {
     public:
-        using typename xcs_impl::GA<Population>::type;
-        using typename xcs_impl::GA<Population>::SymbolType;
-        using typename xcs_impl::GA<Population>::ConditionType;
-        using typename xcs_impl::GA<Population>::ActionType;
-        using typename xcs_impl::GA<Population>::ConditionActionPairType;
-        using typename xcs_impl::GA<Population>::ConstantsType;
-        using typename xcs_impl::GA<Population>::ClassifierType;
-        using typename xcs_impl::GA<Population>::StoredClassifierType;
-        using typename xcs_impl::GA<Population>::ClassifierPtr;
-        using typename xcs_impl::GA<Population>::ClassifierPtrSetType;
-        using typename xcs_impl::GA<Population>::PopulationType;
+        using typename xcsr_impl::GA<Population>::type;
+        using typename xcsr_impl::GA<Population>::SymbolType;
+        using typename xcsr_impl::GA<Population>::ConditionType;
+        using typename xcsr_impl::GA<Population>::ActionType;
+        using typename xcsr_impl::GA<Population>::ConditionActionPairType;
+        using typename xcsr_impl::GA<Population>::ConstantsType;
+        using typename xcsr_impl::GA<Population>::ClassifierType;
+        using typename xcsr_impl::GA<Population>::StoredClassifierType;
+        using typename xcsr_impl::GA<Population>::ClassifierPtr;
+        using typename xcsr_impl::GA<Population>::ClassifierPtrSetType;
+        using typename xcsr_impl::GA<Population>::PopulationType;
 
     protected:
-        using xcs_impl::GA<Population>::m_constants;
-        using xcs_impl::GA<Population>::m_availableActions;
+        using xcsr_impl::GA<Population>::m_constants;
+        using xcsr_impl::GA<Population>::m_availableActions;
 
         // APPLY CROSSOVER (uniform crossover)
         virtual bool uniformCrossover(ClassifierType & cl1, ClassifierType & cl2) const override
@@ -146,6 +146,41 @@ namespace xxr { namespace xcsr_impl { namespace obr
             return isChanged;
         }
 
+        // APPLY CROSSOVER (BLX-alpha crossover)
+        virtual bool blxAlphaCrossover(ClassifierType & cl1, ClassifierType & cl2) const override
+        {
+            assert(cl1.condition.size() == cl2.condition.size());
+
+            for (std::size_t i = 0; i < cl1.condition.size(); ++i)
+            {
+                double l1 = cl1.condition[i].l;
+                double l2 = cl2.condition[i].l;
+                cl1.condition[i].l = l1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (l2 - l1);
+                cl2.condition[i].l = l1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (l2 - l1);
+
+                double u1 = cl1.condition[i].u;
+                double u2 = cl2.condition[i].u;
+                cl1.condition[i].u = u1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (u2 - u1);
+                cl2.condition[i].u = u1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (u2 - u1);
+            }
+
+            // Fix lower and upper order
+            for (std::size_t i = 0; i < cl1.condition.size(); ++i)
+            {
+                if (cl1.condition[i].l > cl1.condition[i].u)
+                {
+                    std::swap(cl1.condition[i].l, cl1.condition[i].u);
+                }
+
+                if (cl2.condition[i].l > cl2.condition[i].u)
+                {
+                    std::swap(cl2.condition[i].l, cl2.condition[i].u);
+                }
+            }
+
+            return true;
+        }
+
         // APPLY MUTATION
         virtual void mutate(ClassifierType & cl, const std::vector<type> & situation) const override
         {
@@ -190,7 +225,7 @@ namespace xxr { namespace xcsr_impl { namespace obr
 
     public:
         // Constructor
-        using xcs_impl::GA<Population>::GA;
+        using xcsr_impl::GA<Population>::GA;
 
         // Destructor
         virtual ~GA() = default;
