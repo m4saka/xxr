@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
         ("resume", "Whether to use initial classifiers (--cinput) to resume previous experiment (\"false\": initialize p/epsilon/F/exp/ts/as to defaults, \"true\": do not initialize values and set system time stamp to the same as that of the latest classifier)", cxxopts::value<bool>()->default_value("false"), "true/false")
         ("m,mux", "Use the real multiplexer problem", cxxopts::value<int>(), "LENGTH")
         ("chk", "Use the n-dimentional checkerboard problem", cxxopts::value<int>(), "N")
+        ("rchk", "Use the n-dimentional 45-degree-rotated checkerboard problem", cxxopts::value<int>(), "N")
         ("chk-div", "The division in the checkerboard problem", cxxopts::value<int>(), "DIVISION")
         ("c,csv", "Use the csv file", cxxopts::value<std::string>(), "FILENAME")
         ("e,csv-eval", "Use the csv file for evaluation", cxxopts::value<std::string>(), "FILENAME")
@@ -145,7 +146,7 @@ int main(int argc, char *argv[])
     if (result.count("blx-alpha"))
         constants.blxAlpha = result["blx-alpha"].as<double>();
 
-    bool isEnvironmentSpecified = (result.count("mux") || result.count("csv") || result.count("chk"));
+    bool isEnvironmentSpecified = (result.count("mux") || result.count("csv") || result.count("chk") || result.count("rchk"));
 
     // Determine crossover method
     if (result["x-method"].as<std::string>() == "uniform")
@@ -349,6 +350,34 @@ int main(int argc, char *argv[])
             std::move(exploitationEnvironments),
             [](CheckerboardEnvironment &){},
             [](CheckerboardEnvironment &){},
+            repr
+        );
+    }
+
+    // Use rotated checkerboard problem
+    if (result.count("rchk"))
+    {
+        if (!result.count("chk-div"))
+        {
+            std::cerr << "Error: The division in the checkerboard problem (--chk-div) is not specified." << std::endl;
+            exit(1);
+        }
+
+        std::vector<std::unique_ptr<RotatedCheckerboardEnvironment>> explorationEnvironments;
+        std::vector<std::unique_ptr<RotatedCheckerboardEnvironment>> exploitationEnvironments;
+        for (std::size_t i = 0; i < settings.seedCount; ++i)
+        {
+            explorationEnvironments.push_back(std::make_unique<RotatedCheckerboardEnvironment>(result["rchk"].as<int>(), result["chk-div"].as<int>()));
+            exploitationEnvironments.push_back(std::make_unique<RotatedCheckerboardEnvironment>(result["rchk"].as<int>(), result["chk-div"].as<int>()));
+        }
+
+        experimentHelper = std::make_unique<ExperimentHelper<XCSR<double, bool>, RotatedCheckerboardEnvironment>>(
+            settings,
+            constants,
+            std::move(explorationEnvironments),
+            std::move(exploitationEnvironments),
+            [](RotatedCheckerboardEnvironment &){},
+            [](RotatedCheckerboardEnvironment &){},
             repr
         );
     }

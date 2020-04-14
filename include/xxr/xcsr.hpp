@@ -4,6 +4,7 @@
 #include "xcsr/experiment.hpp"
 #include "environment/real_multiplexer_environment.hpp"
 #include "environment/checkerboard_environment.hpp"
+#include "environment/rotated_checkerboard_environment.hpp"
 #include "environment/dataset_environment.hpp"
 #include "environment/csv_environment.hpp"
 
