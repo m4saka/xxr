@@ -26,6 +26,8 @@ namespace xxr {
 
         virtual double prediction() const = 0;
 
+        virtual double predictionFor(int action) const = 0;
+
         virtual bool isCoveringPerformed() const = 0;
 
         virtual void loadPopulationCSV(const std::string & filename, bool useAsInitialPopulation = true) = 0;

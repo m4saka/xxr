@@ -120,6 +120,7 @@ namespace xxr { namespace xcs_impl
 
         // Prediction value of the previous action decision (just for logging)
         double m_prediction;
+        std::unordered_map<int, double> m_predictions;
 
         // Covering occurrence of the previous action decision (just for logging)
         bool m_isCoveringPerformed;
@@ -159,6 +160,10 @@ namespace xxr { namespace xcs_impl
 
             const Action action = predictionArray.selectAction();
             m_prediction = predictionArray.predictionFor(action);
+            for (const auto & action : m_availableActions)
+            {
+                m_predictions[action] = predictionArray.predictionFor(action);
+            }
 
             m_actionSet.regenerate(matchSet, action);
 
@@ -258,12 +263,20 @@ namespace xxr { namespace xcs_impl
                     GreedyPredictionArray<MatchSetType> predictionArray(matchSet);
                     const Action action = predictionArray.selectAction();
                     m_prediction = predictionArray.predictionFor(action);
+                    for (const auto & action : m_availableActions)
+                    {
+                        m_predictions[action] = predictionArray.predictionFor(action);
+                    }
                     return action;
                 }
                 else
                 {
                     m_isCoveringPerformed = true;
                     m_prediction = constants.initialPrediction;
+                    for (const auto & action : m_availableActions)
+                    {
+                        m_predictions[action] = constants.initialPrediction;
+                    }
                     return Random::chooseFrom(m_availableActions);
                 }
             }
@@ -274,6 +287,13 @@ namespace xxr { namespace xcs_impl
         virtual double prediction() const
         {
             return m_prediction;
+        }
+
+        // Get prediction value of the action
+        // (Call this function after explore() or exploit())
+        double predictionFor(int action) const
+        {
+            return m_predictions.at(action);
         }
 
         // Get if covering is performed in the previous action decision

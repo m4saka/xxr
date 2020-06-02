@@ -57,7 +57,7 @@ namespace xxr { namespace xcs_impl
                 fsa[cl->action] += cl->fitness;
             }
 
-            m_maxPA = -DBL_EPSILON;
+            m_maxPA = -100000.0;
 
             for (auto && pair : m_pa)
             {
