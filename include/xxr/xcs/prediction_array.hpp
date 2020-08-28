@@ -85,7 +85,7 @@ namespace xxr { namespace xcs_impl
 
         virtual double max() const
         {
-            assert(m_maxPA != -DBL_EPSILON);
+            assert(m_maxPA != -100000.0);
             return m_maxPA;
         }
 
