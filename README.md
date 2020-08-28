@@ -9,6 +9,7 @@ Learning classifier systems (XCS & XCSR) written in C++14
         - Block world (maze/woods) problem (XCS)
         - Real-multiplexer problem (XCSR)
         - Checkerboard problem (XCSR)
+        - Function problem (XCSR)
     - CSV dataset (XCS & XCSR)
 - Also can be used as a header-only library
 
