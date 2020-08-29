@@ -531,7 +531,7 @@ int main(int argc, char *argv[])
             {
                 for (int x = 0; x < 100; ++x)
                 {
-                    int action = experiment.exploit({ x / 100.0, y / 100.0 });
+                    experiment.exploit({ x / 100.0, y / 100.0 });
                     ofs << experiment.predictionFor(0) << ',';
                 }
                 ofs << '\n';
