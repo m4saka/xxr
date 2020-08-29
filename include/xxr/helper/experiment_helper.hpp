@@ -75,7 +75,7 @@ namespace xxr
 
     public:
         template <class... Args>
-        explicit ExperimentHelper(
+        ExperimentHelper(
             const ExperimentSettings & settings,
             typename Experiment::ConstantsType constants,
             std::vector<std::unique_ptr<Environment>> && explorationEnvironments,
