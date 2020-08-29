@@ -70,7 +70,7 @@ namespace xxr
                     )
                 );
             }
-            return std::move(experiments);
+            return experiments;
         }
 
     public:
