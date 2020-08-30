@@ -91,7 +91,7 @@ namespace xxr { namespace xcs_impl
 
         virtual double predictionFor(ActionType action) const
         {
-            return m_pa.at(action);
+            return m_pa.count(action) ? m_pa.at(action) : 0.0/* TODO: use m_constants.initialPrediction instead of zero */;
         }
 
         // SELECT ACTION
