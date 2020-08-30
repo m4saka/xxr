@@ -156,7 +156,7 @@ namespace xxr { namespace xcs_impl
             const MatchSetType matchSet(m_population, situation, m_timeStamp, &this->constants, m_availableActions);
             m_isCoveringPerformed = matchSet.isCoveringPerformed();
 
-            const PredictionArray predictionArray(matchSet, this->constants.exploreProbability);
+            const PredictionArray predictionArray(matchSet, &this->constants, this->constants.exploreProbability);
 
             const Action action = predictionArray.selectAction();
             m_prediction = predictionArray.predictionFor(action);
@@ -223,7 +223,7 @@ namespace xxr { namespace xcs_impl
                 const MatchSetType matchSet(m_population, situation, m_timeStamp, &this->constants, m_availableActions);
                 m_isCoveringPerformed = matchSet.isCoveringPerformed();
 
-                const GreedyPredictionArray<MatchSetType> predictionArray(matchSet);
+                const GreedyPredictionArray<MatchSetType> predictionArray(matchSet, &this->constants);
 
                 const Action action = predictionArray.selectAction();
 
@@ -260,7 +260,7 @@ namespace xxr { namespace xcs_impl
                 {
                     m_isCoveringPerformed = false;
 
-                    GreedyPredictionArray<MatchSetType> predictionArray(matchSet);
+                    GreedyPredictionArray<MatchSetType> predictionArray(matchSet, &this->constants);
                     const Action action = predictionArray.selectAction();
                     m_prediction = predictionArray.predictionFor(action);
                     for (const auto & action : m_availableActions)
