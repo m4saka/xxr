@@ -23,7 +23,7 @@ namespace xxr { namespace xcsr_impl { namespace csr
 
     protected:
         using xcs_impl::MatchSet<Population>::m_set;
-        using xcs_impl::MatchSet<Population>::m_constants;
+        using xcs_impl::MatchSet<Population>::m_pConstants;
         using xcs_impl::MatchSet<Population>::m_availableActions;
 
         // GENERATE COVERING CLASSIFIER
@@ -32,21 +32,21 @@ namespace xxr { namespace xcsr_impl { namespace csr
             std::vector<SymbolType> symbols;
             for (auto && symbol : situation)
             {
-                symbols.emplace_back(symbol, Random::nextDouble(0.0, m_constants.coveringMaxSpread));
+                symbols.emplace_back(symbol, Random::nextDouble(0.0, m_pConstants->coveringMaxSpread));
             }
 
-            return std::make_shared<StoredClassifierType>(symbols, Random::chooseFrom(unselectedActions), timeStamp, m_constants);
+            return std::make_shared<StoredClassifierType>(symbols, Random::chooseFrom(unselectedActions), timeStamp, m_pConstants);
         }
 
     public:
         // Constructor
-        MatchSet(ConstantsType & constants, const std::unordered_set<ActionType> & availableActions)
-            : xcs_impl::MatchSet<Population>(constants, availableActions)
+        MatchSet(const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions)
+            : xcs_impl::MatchSet<Population>(pConstants, availableActions)
         {
         }
 
-        MatchSet(Population & population, const std::vector<type> & situation, uint64_t timeStamp, ConstantsType & constants, const std::unordered_set<ActionType> & availableActions)
-            : MatchSet(constants, availableActions)
+        MatchSet(Population & population, const std::vector<type> & situation, uint64_t timeStamp, const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions)
+            : MatchSet(pConstants, availableActions)
         {
             this->regenerate(population, situation, timeStamp);
         }

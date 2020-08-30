@@ -56,7 +56,7 @@ namespace xxr
         std::vector<std::unique_ptr<Experiment>> makeExperiments(
             const ExperimentSettings & settings,
             const std::unordered_set<typename Experiment::ActionType> & availableActions,
-            typename Experiment::ConstantsType constants,
+            const typename Experiment::ConstantsType & constants,
             Args && ... args)
         {
             std::vector<std::unique_ptr<Experiment>> experiments;
@@ -77,7 +77,7 @@ namespace xxr
         template <class... Args>
         ExperimentHelper(
             const ExperimentSettings & settings,
-            typename Experiment::ConstantsType constants,
+            const typename Experiment::ConstantsType & constants,
             std::vector<std::unique_ptr<Environment>> && explorationEnvironments,
             std::vector<std::unique_ptr<Environment>> && exploitationEnvironments,
             std::function<void(Environment &)> explorationCallback = [](Environment &){},

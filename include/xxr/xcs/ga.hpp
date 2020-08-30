@@ -26,7 +26,7 @@ namespace xxr { namespace xcs_impl
         using PopulationType = Population;
 
     protected:
-        ConstantsType & m_constants;
+        const ConstantsType * const m_pConstants;
         const std::unordered_set<ActionType> & m_availableActions;
 
         // SELECT OFFSPRING
@@ -39,7 +39,7 @@ namespace xxr { namespace xcs_impl
             }
 
             std::size_t selectedIdx;
-            if (m_constants.tau > 0.0 && m_constants.tau <= 1.0)
+            if (m_pConstants->tau > 0.0 && m_pConstants->tau <= 1.0)
             {
                 // Tournament selection
                 std::vector<std::pair<double, std::size_t>> fitnesses;
@@ -48,7 +48,7 @@ namespace xxr { namespace xcs_impl
                 {
                     fitnesses.emplace_back((*target)->fitness, (*target)->numerosity);
                 }
-                selectedIdx = Random::tournamentSelectionMicroClassifier(fitnesses, m_constants.tau);
+                selectedIdx = Random::tournamentSelectionMicroClassifier(fitnesses, m_pConstants->tau);
             }
             else
             {
@@ -122,7 +122,7 @@ namespace xxr { namespace xcs_impl
         // APPLY CROSSOVER
         virtual bool crossover(ClassifierType & cl1, ClassifierType & cl2) const
         {
-            switch (m_constants.crossoverMethod)
+            switch (m_pConstants->crossoverMethod)
             {
             case ConstantsType::CrossoverMethod::UNIFORM_CROSSOVER:
                 return uniformCrossover(cl1, cl2);
@@ -145,7 +145,7 @@ namespace xxr { namespace xcs_impl
 
             for (std::size_t i = 0; i < cl.condition.size(); ++i)
             {
-                if (Random::nextDouble() < m_constants.mu)
+                if (Random::nextDouble() < m_pConstants->mu)
                 {
                     if (cl.condition[i].isDontCare())
                     {
@@ -158,7 +158,7 @@ namespace xxr { namespace xcs_impl
                 }
             }
 
-            if (m_constants.doActionMutation && (Random::nextDouble() < m_constants.mu) && (m_availableActions.size() >= 2))
+            if (m_pConstants->doActionMutation && (Random::nextDouble() < m_pConstants->mu) && (m_availableActions.size() >= 2))
             {
                 std::unordered_set<ActionType> otherPossibleActions(m_availableActions);
                 otherPossibleActions.erase(cl.action);
@@ -168,15 +168,15 @@ namespace xxr { namespace xcs_impl
 
         void insertDiscoveredClassifiers(const ClassifierType & child1, const ClassifierType & child2, const ClassifierPtr & parent1, const ClassifierPtr & parent2, PopulationType & population) const
         {
-            if (m_constants.doGASubsumption)
+            if (m_pConstants->doGASubsumption)
             {
                 subsumeClassifier(child1, parent1, parent2, population);
                 subsumeClassifier(child2, parent1, parent2, population);
             }
             else
             {
-                population.insertOrIncrementNumerosity(std::make_shared<StoredClassifierType>(child1, m_constants));
-                population.insertOrIncrementNumerosity(std::make_shared<StoredClassifierType>(child2, m_constants));
+                population.insertOrIncrementNumerosity(std::make_shared<StoredClassifierType>(child1, m_pConstants));
+                population.insertOrIncrementNumerosity(std::make_shared<StoredClassifierType>(child2, m_pConstants));
             }
 
             while (population.deleteExtraClassifiers()) {}
@@ -217,13 +217,13 @@ namespace xxr { namespace xcs_impl
                 return;
             }
 
-            population.insertOrIncrementNumerosity(std::make_shared<StoredClassifierType>(child, m_constants));
+            population.insertOrIncrementNumerosity(std::make_shared<StoredClassifierType>(child, m_pConstants));
         }
 
     public:
         // Constructor
-        GA(ConstantsType & constants, const std::unordered_set<ActionType> & availableActions)
-            : m_constants(constants)
+        GA(const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions)
+            : m_pConstants(pConstants)
             , m_availableActions(availableActions)
         {
         }
@@ -247,7 +247,7 @@ namespace xxr { namespace xcs_impl
             child1.experience = child2.experience = 0;
 
             bool isChangedByCrossover;
-            if (Random::nextDouble() < m_constants.chi)
+            if (Random::nextDouble() < m_pConstants->chi)
             {
                 isChangedByCrossover = crossover(child1, child2);
             }

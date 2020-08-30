@@ -24,7 +24,7 @@ namespace xxr { namespace xcsr_impl { namespace obr
         using typename xcsr_impl::GA<Population>::PopulationType;
 
     protected:
-        using xcsr_impl::GA<Population>::m_constants;
+        using xcsr_impl::GA<Population>::m_pConstants;
         using xcsr_impl::GA<Population>::m_availableActions;
 
         // APPLY CROSSOVER (uniform crossover)
@@ -155,13 +155,13 @@ namespace xxr { namespace xcsr_impl { namespace obr
             {
                 double l1 = cl1.condition[i].l;
                 double l2 = cl2.condition[i].l;
-                cl1.condition[i].l = l1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (l2 - l1);
-                cl2.condition[i].l = l1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (l2 - l1);
+                cl1.condition[i].l = l1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (l2 - l1);
+                cl2.condition[i].l = l1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (l2 - l1);
 
                 double u1 = cl1.condition[i].u;
                 double u2 = cl2.condition[i].u;
-                cl1.condition[i].u = u1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (u2 - u1);
-                cl2.condition[i].u = u1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (u2 - u1);
+                cl1.condition[i].u = u1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (u2 - u1);
+                cl2.condition[i].u = u1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (u2 - u1);
             }
 
             // Fix lower and upper order
@@ -189,22 +189,22 @@ namespace xxr { namespace xcsr_impl { namespace obr
             // Mutate lower or upper
             for (std::size_t i = 0; i < cl.condition.size(); ++i)
             {
-                if (Random::nextDouble() < m_constants.mu)
+                if (Random::nextDouble() < m_pConstants->mu)
                 {
                     if (Random::nextDouble() < 0.5)
                     {
-                        cl.condition[i].l += Random::nextDouble(-m_constants.mutationMaxChange, m_constants.mutationMaxChange);
-                        if (m_constants.doRangeRestriction)
+                        cl.condition[i].l += Random::nextDouble(-m_pConstants->mutationMaxChange, m_pConstants->mutationMaxChange);
+                        if (m_pConstants->doRangeRestriction)
                         {
-                            cl.condition[i].l = std::min(std::max(m_constants.minValue, cl.condition[i].l), m_constants.maxValue);
+                            cl.condition[i].l = std::min(std::max(m_pConstants->minValue, cl.condition[i].l), m_pConstants->maxValue);
                         }
                     }
                     else
                     {
-                        cl.condition[i].u += Random::nextDouble(-m_constants.mutationMaxChange, m_constants.mutationMaxChange);
-                        if (m_constants.doRangeRestriction)
+                        cl.condition[i].u += Random::nextDouble(-m_pConstants->mutationMaxChange, m_pConstants->mutationMaxChange);
+                        if (m_pConstants->doRangeRestriction)
                         {
-                            cl.condition[i].u = std::min(std::max(m_constants.minValue, cl.condition[i].u), m_constants.maxValue);
+                            cl.condition[i].u = std::min(std::max(m_pConstants->minValue, cl.condition[i].u), m_pConstants->maxValue);
                         }
                     }
                 }
@@ -215,7 +215,7 @@ namespace xxr { namespace xcsr_impl { namespace obr
                 }
             }
 
-            if (m_constants.doActionMutation && (Random::nextDouble() < m_constants.mu) && (m_availableActions.size() >= 2))
+            if (m_pConstants->doActionMutation && (Random::nextDouble() < m_pConstants->mu) && (m_availableActions.size() >= 2))
             {
                 std::unordered_set<ActionType> otherPossibleActions(m_availableActions);
                 otherPossibleActions.erase(cl.action);

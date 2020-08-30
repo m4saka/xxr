@@ -129,9 +129,9 @@ namespace xxr { namespace xcs_impl
         // Constructor
         Experiment(const std::unordered_set<Action> & availableActions, const ConstantsType & constants)
             : constants(constants)
-            , m_population(this->constants, availableActions)
-            , m_actionSet(this->constants, availableActions)
-            , m_prevActionSet(this->constants, availableActions)
+            , m_population(&this->constants, availableActions)
+            , m_actionSet(&this->constants, availableActions)
+            , m_prevActionSet(&this->constants, availableActions)
             , m_availableActions(availableActions)
             , m_timeStamp(0)
             , m_expectsReward(false)
@@ -153,10 +153,10 @@ namespace xxr { namespace xcs_impl
             // [M]
             //   The match set [M] is formed out of the current [P].
             //   It includes all classifiers that match the current situation.
-            const MatchSetType matchSet(m_population, situation, m_timeStamp, this->constants, m_availableActions);
+            const MatchSetType matchSet(m_population, situation, m_timeStamp, &this->constants, m_availableActions);
             m_isCoveringPerformed = matchSet.isCoveringPerformed();
 
-            const PredictionArray predictionArray(matchSet, constants.exploreProbability);
+            const PredictionArray predictionArray(matchSet, this->constants.exploreProbability);
 
             const Action action = predictionArray.selectAction();
             m_prediction = predictionArray.predictionFor(action);
@@ -220,7 +220,7 @@ namespace xxr { namespace xcs_impl
                 // [M]
                 //   The match set [M] is formed out of the current [P].
                 //   It includes all classifiers that match the current situation.
-                const MatchSetType matchSet(m_population, situation, m_timeStamp, this->constants, m_availableActions);
+                const MatchSetType matchSet(m_population, situation, m_timeStamp, &this->constants, m_availableActions);
                 m_isCoveringPerformed = matchSet.isCoveringPerformed();
 
                 const GreedyPredictionArray<MatchSetType> predictionArray(matchSet);
@@ -234,7 +234,7 @@ namespace xxr { namespace xcs_impl
 
                 if (!m_prevActionSet.empty())
                 {
-                    double p = m_prevReward + constants.gamma * predictionArray.max();
+                    double p = m_prevReward + this->constants.gamma * predictionArray.max();
                     m_prevActionSet.update(p, m_population);
 
                     // Do not perform GA operations in exploitation
@@ -247,7 +247,7 @@ namespace xxr { namespace xcs_impl
             else
             {
                 // Create new match set as sandbox
-                MatchSetType matchSet(constants, m_availableActions);
+                MatchSetType matchSet(&this->constants, m_availableActions);
                 for (auto && cl : m_population)
                 {
                     if (cl->condition.matches(situation))
@@ -272,10 +272,10 @@ namespace xxr { namespace xcs_impl
                 else
                 {
                     m_isCoveringPerformed = true;
-                    m_prediction = constants.initialPrediction;
+                    m_prediction = this->constants.initialPrediction;
                     for (const auto & action : m_availableActions)
                     {
-                        m_predictions[action] = constants.initialPrediction;
+                        m_predictions[action] = this->constants.initialPrediction;
                     }
                     return Random::chooseFrom(m_availableActions);
                 }
@@ -323,9 +323,9 @@ namespace xxr { namespace xcs_impl
             {
                 for (auto && cl : population)
                 {
-                    cl.prediction = constants.initialPrediction;
-                    cl.epsilon = constants.initialEpsilon;
-                    cl.fitness = constants.initialFitness;
+                    cl.prediction = this->constants.initialPrediction;
+                    cl.epsilon = this->constants.initialEpsilon;
+                    cl.fitness = this->constants.initialFitness;
                     cl.experience = 0;
                     cl.timeStamp = 0;
                     cl.actionSetSize = 1;
@@ -341,7 +341,7 @@ namespace xxr { namespace xcs_impl
             m_population.clear();
             for (auto && cl : classifiers)
             {
-                m_population.emplace(std::make_shared<StoredClassifierType>(cl, constants));
+                m_population.emplace(std::make_shared<StoredClassifierType>(cl, &this->constants));
             }
 
             // Clear action set and reset status

@@ -24,7 +24,7 @@ namespace xxr { namespace xcsr_impl { namespace csr
         using typename xcsr_impl::GA<Population>::PopulationType;
 
     protected:
-        using xcsr_impl::GA<Population>::m_constants;
+        using xcsr_impl::GA<Population>::m_pConstants;
         using xcsr_impl::GA<Population>::m_availableActions;
 
         // APPLY CROSSOVER (uniform crossover)
@@ -110,13 +110,13 @@ namespace xxr { namespace xcsr_impl { namespace csr
             {
                 double c1 = cl1.condition[i].center;
                 double c2 = cl2.condition[i].center;
-                cl1.condition[i].center = c1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (c2 - c1);
-                cl2.condition[i].center = c1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (c2 - c1);
+                cl1.condition[i].center = c1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (c2 - c1);
+                cl2.condition[i].center = c1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (c2 - c1);
 
                 double s1 = cl1.condition[i].spread;
                 double s2 = cl2.condition[i].spread;
-                cl1.condition[i].spread = s1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (s2 - s1);
-                cl2.condition[i].spread = s1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (s2 - s1);
+                cl1.condition[i].spread = s1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (s2 - s1);
+                cl2.condition[i].spread = s1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (s2 - s1);
             }
 
             return true;
@@ -130,22 +130,22 @@ namespace xxr { namespace xcsr_impl { namespace csr
             // Mutate center or spread
             for (std::size_t i = 0; i < cl.condition.size(); ++i)
             {
-                if (Random::nextDouble() < m_constants.mu)
+                if (Random::nextDouble() < m_pConstants->mu)
                 {
                     if (Random::nextDouble() < 0.5)
                     {
-                        cl.condition[i].center += Random::nextDouble(-m_constants.mutationMaxChange, m_constants.mutationMaxChange);
-                        cl.condition[i].center = std::min(std::max(m_constants.minValue, cl.condition[i].center), m_constants.maxValue);
+                        cl.condition[i].center += Random::nextDouble(-m_pConstants->mutationMaxChange, m_pConstants->mutationMaxChange);
+                        cl.condition[i].center = std::min(std::max(m_pConstants->minValue, cl.condition[i].center), m_pConstants->maxValue);
                     }
                     else
                     {
-                        cl.condition[i].spread += Random::nextDouble(-m_constants.mutationMaxChange, m_constants.mutationMaxChange);
+                        cl.condition[i].spread += Random::nextDouble(-m_pConstants->mutationMaxChange, m_pConstants->mutationMaxChange);
                         cl.condition[i].spread = std::max(0.0, cl.condition[i].spread);
                     }
                 }
             }
 
-            if (m_constants.doActionMutation && (Random::nextDouble() < m_constants.mu) && (m_availableActions.size() >= 2))
+            if (m_pConstants->doActionMutation && (Random::nextDouble() < m_pConstants->mu) && (m_availableActions.size() >= 2))
             {
                 std::unordered_set<ActionType> otherPossibleActions(m_availableActions);
                 otherPossibleActions.erase(cl.action);
