@@ -99,7 +99,6 @@ int main()
 
     return 0;
 }
-
 ```
 
 # Reference
@@ -112,11 +111,8 @@ int main()
     - The original paper of XCSR.
     - The Center-Spread representation is proposed in this paper.
 - C. Stone, L. Bull, "For Real! XCS with Continuous-Valued Inputs," Evolutionary Computation, Vol. 11, No.3, pp.299-336, Fall 2003. https://doi.org/10.1162/106365603322365315
-    - The Ordered Bound Representation (which is equivalent of LU representation) is proposed based on the representation in XCSI [Wilson, 2001].
-    - The Unordered Bound Representation is proposed in this paper.
-    - The UB (Unordered Bound) representation in this program is based on this paper.
-        - To reproduce the results in this paper, use `--do-covering-random-range-truncation=true` option to truncate the random range in covering.
-
+    - The Ordered Bound Representation (which is equivalent of LU representation) is proposed based on the the interval-based integer representation in XCSI [Wilson, 2001].
+    - The Unordered Bound Representation (UBR) is proposed in this paper.
 - A. Wada, K. Takadama, K. Shimohara, O. Katai, "Analyzing Parameter Sensitivity and Classifier Representations for Real-Valued XCS," Learning Classifier Systems. IWLCS 2003, IWLCS 2004, IWLCS 2005, Lecture Notes in Computer Science, vol 4399, pp 1-16, 2007. https://doi.org/10.1007/978-3-540-71231-2_1
-    - The Ordered Bound Representation (LU representation) is rediscovered based on the representation in XCSI [Wilson, 2001].
-    - The CS (Center-Spread) representation and the LU (Lower-Upper) representation in this program are based on this paper.
+    - The Ordered Bound Representation (called "LU representation" in this paper) is rediscovered based on the interval-based integer representation in XCSI [Wilson, 2001].
+    - The Center-Spread representation (CSR) and the Lower-Upper representation (OBR) in this program are based on this paper.
