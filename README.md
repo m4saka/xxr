@@ -1,3 +1,14 @@
+# Notice: This is an old project!
+Newer project => [m4saka/xcspp](https://github.com/m4saka/xcspp)
+- Changes from xxr:
+    - Much simpler code (w/o complex C++ template)
+    - Not using non-thread-safe random utility
+    - Using exception instead of C-style assertion
+- XCSR has not been implemented yet.
+- The command-line tool is not yet available.
+
+--------
+
 # **xxr** : XCS &amp; XCSR Application / C++ Library
 Learning classifier systems (XCS & XCSR) written in C++14
 
