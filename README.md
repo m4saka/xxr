@@ -1,4 +1,4 @@
-# Notice: This is an old project!
+# Notice: Our next project of XCS library is available!
 Newer project => [m4saka/xcspp](https://github.com/m4saka/xcspp)
 - Changes from xxr:
     - Much simpler code (w/o complex C++ template)
