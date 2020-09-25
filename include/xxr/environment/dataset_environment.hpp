@@ -18,6 +18,7 @@ namespace xxr
     protected:
         const Dataset<T, Action> m_dataset;
         std::vector<T> m_situation;
+        std::vector<T> m_situationSigma;
         Action m_answer;
         std::size_t m_nextIdx;
         const bool m_chooseRandom;
@@ -29,11 +30,13 @@ namespace xxr
             {
                 const auto idx = Random::nextInt<std::size_t>(0UL, m_dataset.situations.size() - 1UL);
                 m_situation = m_dataset.situations[idx];
+                m_situationSigma = m_dataset.situationSigmas[idx];
                 m_answer = m_dataset.actions[idx];
             }
             else
             {
                 m_situation = m_dataset.situations[m_nextIdx];
+                m_situationSigma = m_dataset.situationSigmas[m_nextIdx];
                 m_answer = m_dataset.actions[m_nextIdx];
                 if (++m_nextIdx >= m_dataset.situations.size())
                 {
@@ -62,6 +65,11 @@ namespace xxr
         virtual std::vector<T> situation() const override
         {
             return m_situation;
+        }
+
+        std::vector<T> situationSigma() const
+        {
+            return m_situationSigma;
         }
 
         virtual double executeAction(Action action) override

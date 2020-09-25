@@ -137,7 +137,7 @@ namespace xxr
                             do
                             {
                                 // Choose action
-                                auto action = m_experiments[j]->exploit(m_exploitationEnvironments[j]->situation(), m_settings.updateInExploitation);
+                                auto action = m_experiments[j]->exploit(m_exploitationEnvironments[j]->situation(), m_exploitationEnvironments[j]->situationSigma(), m_settings.updateInExploitation);
 
                                 // Get reward
                                 double reward = m_exploitationEnvironments[j]->executeAction(action);
@@ -220,11 +220,8 @@ namespace xxr
                     {
                         do
                         {
-                            // Get situation from environment
-                            auto situation = m_explorationEnvironments[j]->situation();
-
                             // Choose action
-                            auto action = m_experiments[j]->explore(situation);
+                            auto action = m_experiments[j]->explore(m_explorationEnvironments[j]->situation(), m_explorationEnvironments[j]->situationSigma());
 
                             // Get reward
                             double reward = m_explorationEnvironments[j]->executeAction(action);

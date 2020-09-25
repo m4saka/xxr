@@ -8,6 +8,7 @@ namespace xxr
     struct Dataset
     {
         std::vector<std::vector<T>> situations;
+        std::vector<std::vector<T>> situationSigmas;
         std::vector<Action> actions;
     };
 
@@ -57,6 +58,21 @@ namespace xxr
         return { min, max };
     }
 
+    template <typename T>
+    void normalizeScale(std::vector<std::vector<T>> & situationSigmas, T min, T max)
+    {
+        if (min != 0.0 || max != 1.0)
+        {
+            for (auto && situationSigma : situationSigmas)
+            {
+                for (auto && value : situationSigma)
+                {
+                    value = value / (max - min);
+                }
+            }
+        }
+    }
+
     // Denormalize data by min/max value
     template <typename T>
     void denormalize(std::vector<std::vector<T>> & situations, T min, T max)
@@ -77,6 +93,21 @@ namespace xxr
     void denormalize(std::vector<std::vector<T>> & situations, const std::pair<T, T> & minmax)
     {
         denormalize(minmax.first, minmax.second);
+    }
+
+    template <typename T>
+    void denormalizeScale(std::vector<std::vector<T>> & situationSigmas, T min, T max)
+    {
+        if (min != 0.0 || max != 1.0)
+        {
+            for (auto && situationSigma : situationSigmas)
+            {
+                for (auto && value : situationSigma)
+                {
+                    value = value * (max - min);
+                }
+            }
+        }
     }
 
 }

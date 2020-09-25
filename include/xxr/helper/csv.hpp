@@ -49,7 +49,7 @@ namespace xxr
                 situations.push_back(situation);
             }
 
-            return { situations, actions };
+            return { situations, situations/*FIXME: dummy*/, actions };
         }
 
         template <typename T, typename Action>
