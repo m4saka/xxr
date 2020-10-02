@@ -46,6 +46,8 @@ int main(int argc, char *argv[])
         ("c,csv", "Use the csv file", cxxopts::value<std::string>(), "FILENAME")
         ("e,csv-eval", "Use the csv file for evaluation", cxxopts::value<std::string>(), "FILENAME")
         ("csv-random", "Whether to choose lines in random order from the csv file", cxxopts::value<bool>()->default_value("true"), "true/false")
+        ("csv-estimate", "The csv file to estimate the outputs", cxxopts::value<std::string>(), "FILENAME")
+        ("csv-estimate-best", "Output the result of the desired action for the situations in the csv file specified by --csv-estimate", cxxopts::value<std::string>(), "FILENAME")
         ("max-step", "The maximum number of steps in the multi-step problem", cxxopts::value<uint64_t>()->default_value("50"))
         ("i,iter", "The number of iterations", cxxopts::value<uint64_t>()->default_value("20000"), "COUNT")
         ("condense-iter", "The number of iterations for the Wilson's rule condensation method (chi=0, mu=0) after normal iterations", cxxopts::value<uint64_t>()->default_value("0"), "COUNT")
@@ -548,6 +550,30 @@ int main(int argc, char *argv[])
                 ofs << std::endl;
             }
         }
+    }
+
+    // Save estimated results for unknown data
+    if (result.count("csv-estimate"))
+    {
+        auto & experimentHelperRef = dynamic_cast<ExperimentHelper<XCS<int, int>, DatasetEnvironment<int, int>> &>(*experimentHelper);
+        auto & experiment = experimentHelperRef.experimentAt(0);
+
+        // Load CSV file
+        std::ifstream ifs(result["csv-estimate"].as<std::string>());
+        auto situations = CSV::readSituations<int>(ifs);
+        ifs.close();
+
+        // Choose the best action for each situation
+        for (auto & situation : situations)
+        {
+            int action = experiment.exploit(situation);
+            situation.push_back(action);
+        }
+
+        // Save CSV file
+        std::string filename = settings.outputFilenamePrefix + result["csv-estimate-best"].as<std::string>();
+        std::ofstream ofs(filename);
+        CSV::saveCSV(ofs, situations);
     }
 
     return 0;

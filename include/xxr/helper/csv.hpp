@@ -14,6 +14,56 @@ namespace xxr
 
     namespace CSV
     {
+        template <typename T>
+        void saveCSV(std::ostream & os, const std::vector<std::vector<T>> & data)
+        {
+            for (const auto & line : data)
+            {
+                for (std::size_t i = 0; i < line.size(); ++i)
+                {
+                    os << line[i];
+                    if (i != line.size() - 1)
+                    {
+                        os << ',';
+                    }
+                }
+                os << '\n';
+            }
+        }
+
+        template <typename T>
+        std::vector<std::vector<T>> readSituations(std::istream & is, bool rounds = false)
+        {
+            std::vector<std::vector<T>> situations;
+
+            // Load all lines from csv
+            std::string line;
+            while (std::getline(is, line) && !line.empty())
+            {
+                // Split comma-separated string
+                std::istringstream iss(line);
+                std::string field;
+                double fieldValue;
+                std::vector<T> situation;
+                bool empty = true;
+                while (std::getline(iss, field, ','))
+                {
+                    fieldValue = std::stof(field);
+                    situation.push_back(static_cast<T>(rounds ? std::round(fieldValue) : fieldValue));
+                    empty = false;
+                }
+
+                if (empty)
+                {
+                    break; // this gets rid of maybe-uninitialized warning
+                }
+
+                situations.push_back(situation);
+            }
+
+            return situations;
+        }
+
         template <typename T, typename Action>
         Dataset<T, Action> readDataset(std::istream & is, bool rounds = false)
         {
