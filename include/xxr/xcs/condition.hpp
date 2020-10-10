@@ -43,11 +43,11 @@ namespace xxr { namespace xcs_impl
 
                 if (symbol == "#")
                 {
-                    m_symbols.emplace_back('#');
+                    m_symbols.emplace_back(); // the default constructor generates '#'
                 }
                 else
                 {
-                    m_symbols.emplace_back(std::stoi(symbol));
+                    m_symbols.emplace_back(static_cast<type>(std::stoi(symbol)));
                 }
             }
         }
