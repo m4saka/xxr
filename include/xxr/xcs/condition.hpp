@@ -32,9 +32,18 @@ namespace xxr { namespace xcs_impl
 
         explicit Condition(const std::string & symbols)
         {
-            for (const char symbol : symbols)
+            std::istringstream iss(symbols);
+            std::string symbol;
+            while (std::getline(iss, symbol, ' '))
             {
-                m_symbols.emplace_back(symbol);
+                if (symbol == "#")
+                {
+                    m_symbols.emplace_back('#');
+                }
+                else
+                {
+                    m_symbols.emplace_back(std::stoi(symbol));
+                }
             }
         }
 
