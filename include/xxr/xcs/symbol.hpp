@@ -67,9 +67,9 @@ namespace xxr { namespace xcs_impl
         virtual std::string toString() const override
         {
             if (isDontCare())
-                return "#";
+                return "# ";
             else
-                return std::to_string(value());
+                return std::to_string(value()) + " ";
         }
 
         friend bool operator== (const Symbol<T> & lhs, const Symbol<T> & rhs)
