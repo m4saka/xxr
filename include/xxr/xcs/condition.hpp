@@ -36,6 +36,11 @@ namespace xxr { namespace xcs_impl
             std::string symbol;
             while (std::getline(iss, symbol, ' '))
             {
+                if (symbol.empty())
+                {
+                    continue;
+                }
+
                 if (symbol == "#")
                 {
                     m_symbols.emplace_back('#');
