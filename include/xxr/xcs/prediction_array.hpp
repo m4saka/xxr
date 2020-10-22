@@ -29,6 +29,8 @@ namespace xxr { namespace xcs_impl
         using MatchSetType = MatchSet;
 
     protected:
+        const ConstantsType * const m_pConstants;
+
         // PA (Prediction Array)
         std::unordered_map<ActionType, double> m_pa;
 
@@ -43,7 +45,8 @@ namespace xxr { namespace xcs_impl
 
     public:
         // GENERATE PREDICTION ARRAY
-        explicit AbstractPredictionArray(const MatchSet & matchSet)
+        AbstractPredictionArray(const MatchSet & matchSet, const ConstantsType *pConstants)
+            : m_pConstants(pConstants)
         {
             // FSA (Fitness Sum Array)
             std::unordered_map<ActionType, double> fsa;
@@ -57,7 +60,7 @@ namespace xxr { namespace xcs_impl
                 fsa[cl->action] += cl->fitness;
             }
 
-            m_maxPA = -DBL_EPSILON;
+            m_maxPA = -100000.0;
 
             for (auto && pair : m_pa)
             {
@@ -85,13 +88,13 @@ namespace xxr { namespace xcs_impl
 
         virtual double max() const
         {
-            assert(m_maxPA != -DBL_EPSILON);
+            assert(m_maxPA != -100000.0);
             return m_maxPA;
         }
 
         virtual double predictionFor(ActionType action) const
         {
-            return m_pa.at(action);
+            return m_pa.count(action) ? m_pa.at(action) : m_pConstants->initialPrediction;
         }
 
         // SELECT ACTION
@@ -149,8 +152,8 @@ namespace xxr { namespace xcs_impl
 
     public:
         // Constructor
-        EpsilonGreedyPredictionArray(const MatchSet & matchSet, double epsilon)
-            : AbstractPredictionArray<MatchSet>(matchSet), m_epsilon(epsilon) {}
+        EpsilonGreedyPredictionArray(const MatchSet & matchSet, const ConstantsType *pConstants, double epsilon)
+            : AbstractPredictionArray<MatchSet>(matchSet, pConstants), m_epsilon(epsilon) {}
 
         ActionType selectAction() const override
         {

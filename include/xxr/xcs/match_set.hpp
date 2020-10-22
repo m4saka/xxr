@@ -24,7 +24,7 @@ namespace xxr { namespace xcs_impl
         using typename ClassifierPtrSetType::ClassifierPtr;
 
     protected:
-        using Population::ClassifierPtrSetType::m_constants;
+        using Population::ClassifierPtrSetType::m_pConstants;
         using Population::ClassifierPtrSetType::m_availableActions;
         using Population::ClassifierPtrSetType::m_set;
 
@@ -33,8 +33,8 @@ namespace xxr { namespace xcs_impl
         // GENERATE COVERING CLASSIFIER
         virtual ClassifierPtr generateCoveringClassifier(const std::vector<type> & situation, const std::unordered_set<ActionType> & unselectedActions, uint64_t timeStamp) const
         {
-            auto cl = std::make_shared<StoredClassifierType>(situation, Random::chooseFrom(unselectedActions), timeStamp, m_constants);
-            cl->condition.setDontCareAtRandom(m_constants.dontCareProbability);
+            auto cl = std::make_shared<StoredClassifierType>(situation, Random::chooseFrom(unselectedActions), timeStamp, m_pConstants);
+            cl->condition.setDontCareAtRandom(m_pConstants->dontCareProbability);
 
             return cl;
         }
@@ -43,8 +43,8 @@ namespace xxr { namespace xcs_impl
         // Constructor
         using ClassifierPtrSetType::ClassifierPtrSetType;
 
-        MatchSet(Population & population, const std::vector<type> & situation, uint64_t timeStamp, ConstantsType & constants, const std::unordered_set<ActionType> & availableActions)
-            : ClassifierPtrSetType(constants, availableActions)
+        MatchSet(Population & population, const std::vector<type> & situation, uint64_t timeStamp, const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions)
+            : ClassifierPtrSetType(pConstants, availableActions)
             , m_isCoveringPerformed(false)
         {
             regenerate(population, situation, timeStamp);
@@ -57,7 +57,7 @@ namespace xxr { namespace xcs_impl
         virtual void regenerate(Population & population, const std::vector<type> & situation, uint64_t timeStamp)
         {
             // Set theta_mna (the minimal number of actions) to the number of action choices if theta_mna is 0
-            auto thetaMna = (m_constants.thetaMna == 0) ? m_availableActions.size() : m_constants.thetaMna;
+            auto thetaMna = (m_pConstants->thetaMna == 0) ? m_availableActions.size() : m_pConstants->thetaMna;
 
             auto unselectedActions = m_availableActions;
 

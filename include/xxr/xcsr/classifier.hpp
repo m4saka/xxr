@@ -77,7 +77,7 @@ namespace xxr { namespace xcsr_impl
         using xcs_impl::StoredClassifier<Classifier, Constants>::action;
         using xcs_impl::StoredClassifier<Classifier, Constants>::isSubsumer;
         using xcs_impl::StoredClassifier<Classifier, Constants>::isMoreGeneral;
-        using xcs_impl::StoredClassifier<Classifier, Constants>::m_constants;
+        using xcs_impl::StoredClassifier<Classifier, Constants>::m_pConstants;
 
         using xcs_impl::StoredClassifier<Classifier, Constants>::prediction;
         using xcs_impl::StoredClassifier<Classifier, Constants>::epsilon;
@@ -96,7 +96,7 @@ namespace xxr { namespace xcsr_impl
         // DOES SUBSUME
         virtual bool subsumes(const Classifier & cl) const override
         {
-            return action == cl.action && isSubsumer() && isMoreGeneral(cl, m_constants.subsumptionTolerance);
+            return action == cl.action && isSubsumer() && isMoreGeneral(cl, m_pConstants->subsumptionTolerance);
         }
     };
 

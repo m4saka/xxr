@@ -28,7 +28,7 @@ namespace xxr { namespace xcs_impl
 
     protected:
         using ClassifierPtrSetType::m_set;
-        using ClassifierPtrSetType::m_constants;
+        using ClassifierPtrSetType::m_pConstants;
         using ClassifierPtrSetType::m_availableActions;
 
         GA m_ga;
@@ -45,7 +45,7 @@ namespace xxr { namespace xcs_impl
 
             for (auto && cl : m_set)
             {
-                cl->fitness += m_constants.beta * (cl->accuracy() * cl->numerosity / accuracySum - cl->fitness);
+                cl->fitness += m_pConstants->beta * (cl->accuracy() * cl->numerosity / accuracySum - cl->fitness);
             }
         }
 
@@ -87,16 +87,16 @@ namespace xxr { namespace xcs_impl
 
     public:
         // Constructor
-        ActionSet(ConstantsType & constants, const std::unordered_set<ActionType> & availableActions) :
-            ClassifierPtrSetType(constants, availableActions),
-            m_ga(constants, availableActions)
+        ActionSet(const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions)
+            : ClassifierPtrSetType(pConstants, availableActions)
+            , m_ga(pConstants, availableActions)
         {
         }
 
         template <class MatchSet>
-        ActionSet(const MatchSet & matchSet, ActionType action, ConstantsType & constants, const std::unordered_set<ActionType> & availableActions) :
-            ClassifierPtrSetType(constants, availableActions),
-            m_ga(constants, availableActions)
+        ActionSet(const MatchSet & matchSet, ActionType action, const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions)
+            : ClassifierPtrSetType(pConstants, availableActions)
+            , m_ga(pConstants, availableActions)
         {
             regenerate(matchSet, action);
         }
@@ -141,7 +141,7 @@ namespace xxr { namespace xcs_impl
             }
             assert(averageTimeStamp < timeStamp + 1);
 
-            if (timeStamp - averageTimeStamp >= m_constants.thetaGA)
+            if (timeStamp - averageTimeStamp >= m_pConstants->thetaGA)
             {
                 for (auto && cl : m_set)
                 {
@@ -167,31 +167,31 @@ namespace xxr { namespace xcs_impl
                 ++cl->experience;
 
                 // Update prediction, prediction error
-                if (m_constants.useMAM && cl->experience < 1.0 / m_constants.beta)
+                if (m_pConstants->useMAM && cl->experience < 1.0 / m_pConstants->beta)
                 {
                     cl->epsilon += (std::abs(p - cl->prediction) - cl->epsilon) / cl->experience;
                     cl->prediction += (p - cl->prediction) / cl->experience;
                 }
                 else
                 {
-                    cl->epsilon += m_constants.beta * (std::abs(p - cl->prediction) - cl->epsilon);
-                    cl->prediction += m_constants.beta * (p - cl->prediction);
+                    cl->epsilon += m_pConstants->beta * (std::abs(p - cl->prediction) - cl->epsilon);
+                    cl->prediction += m_pConstants->beta * (p - cl->prediction);
                 }
 
                 // Update action set size estimate
-                if (cl->experience < 1.0 / m_constants.beta)
+                if (cl->experience < 1.0 / m_pConstants->beta)
                 {
                     cl->actionSetSize += (numerositySum - cl->actionSetSize) / cl->experience;
                 }
                 else
                 {
-                    cl->actionSetSize += m_constants.beta * (numerositySum - cl->actionSetSize);
+                    cl->actionSetSize += m_pConstants->beta * (numerositySum - cl->actionSetSize);
                 }
             }
 
             updateFitness();
 
-            if (m_constants.doActionSetSubsumption)
+            if (m_pConstants->doActionSetSubsumption)
             {
                 doSubsumption(population);
             }

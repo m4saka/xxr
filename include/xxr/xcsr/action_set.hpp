@@ -24,7 +24,7 @@ namespace xxr { namespace xcsr_impl
 
     protected:
         using xcs_impl::ActionSet<GA>::m_set;
-        using xcs_impl::ActionSet<GA>::m_constants;
+        using xcs_impl::ActionSet<GA>::m_pConstants;
         using xcs_impl::ActionSet<GA>::m_availableActions;
 
         // DO ACTION SET SUBSUMPTION
@@ -36,7 +36,7 @@ namespace xxr { namespace xcsr_impl
             {
                 if (c->isSubsumer())
                 {
-                    if (cl.get() == nullptr || c->isMoreGeneral(*cl, m_constants.subsumptionTolerance))
+                    if (cl.get() == nullptr || c->isMoreGeneral(*cl, m_pConstants->subsumptionTolerance))
                     {
                         cl = c;
                     }
@@ -48,7 +48,7 @@ namespace xxr { namespace xcsr_impl
                 std::vector<ClassifierPtr> removedClassifiers;
                 for (auto && c : m_set)
                 {
-                    if (cl->isMoreGeneral(*c, m_constants.subsumptionTolerance))
+                    if (cl->isMoreGeneral(*c, m_pConstants->subsumptionTolerance))
                     {
                         cl->numerosity += c->numerosity;
                         removedClassifiers.push_back(c);
@@ -65,14 +65,14 @@ namespace xxr { namespace xcsr_impl
 
     public:
         // Constructor
-        ActionSet(ConstantsType & constants, const std::unordered_set<ActionType> & availableActions) :
-            xcs_impl::ActionSet<GA>(constants, availableActions)
+        ActionSet(const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions) :
+            xcs_impl::ActionSet<GA>(pConstants, availableActions)
         {
         }
 
         template <class MatchSet>
-        ActionSet(const MatchSet & matchSet, ActionType action, ConstantsType & constants, const std::unordered_set<ActionType> & availableActions) :
-            ActionSet(constants, availableActions)
+        ActionSet(const MatchSet & matchSet, ActionType action, const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions) :
+            ActionSet(pConstants, availableActions)
         {
             this->regenerate(matchSet, action);
         }

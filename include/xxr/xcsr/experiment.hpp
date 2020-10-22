@@ -78,6 +78,13 @@ namespace xxr { namespace xcsr_impl
             return m_experiment->prediction();
         }
 
+        // Get prediction value of the action
+        // (Call this function after explore() or exploit())
+        double predictionFor(int action) const
+        {
+            return m_experiment->predictionFor(action);
+        }
+
         // Get if covering is performed in the previous action decision
         // (Call this function after explore() or exploit())
         virtual bool isCoveringPerformed() const

@@ -22,7 +22,7 @@ namespace xxr { namespace xcsr_impl
         using typename xcs_impl::GA<Population>::PopulationType;
 
     protected:
-        using xcs_impl::GA<Population>::m_constants;
+        using xcs_impl::GA<Population>::m_pConstants;
         using xcs_impl::GA<Population>::m_availableActions;
         using xcs_impl::GA<Population>::uniformCrossover;
         using xcs_impl::GA<Population>::onePointCrossover;
@@ -33,7 +33,7 @@ namespace xxr { namespace xcsr_impl
         // APPLY CROSSOVER
         virtual bool crossover(ClassifierType & cl1, ClassifierType & cl2) const override
         {
-            switch (m_constants.crossoverMethod)
+            switch (m_pConstants->crossoverMethod)
             {
             case ConstantsType::CrossoverMethod::UNIFORM_CROSSOVER:
                 return uniformCrossover(cl1, cl2);

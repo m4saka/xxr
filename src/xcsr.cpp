@@ -35,7 +35,10 @@ int main(int argc, char *argv[])
         ("resume", "Whether to use initial classifiers (--cinput) to resume previous experiment (\"false\": initialize p/epsilon/F/exp/ts/as to defaults, \"true\": do not initialize values and set system time stamp to the same as that of the latest classifier)", cxxopts::value<bool>()->default_value("false"), "true/false")
         ("m,mux", "Use the real multiplexer problem", cxxopts::value<int>(), "LENGTH")
         ("chk", "Use the n-dimentional checkerboard problem", cxxopts::value<int>(), "N")
+        ("rchk", "Use the n-dimentional 45-degree-rotated checkerboard problem", cxxopts::value<int>(), "N")
         ("chk-div", "The division in the checkerboard problem", cxxopts::value<int>(), "DIVISION")
+        ("func", "Use the function problem", cxxopts::value<int>(), "FUNCNO")
+        ("func-output-pred", "Output the reward prediction for pixels in the function problem", cxxopts::value<std::string>()->default_value(""), "FILENAME")
         ("c,csv", "Use the csv file", cxxopts::value<std::string>(), "FILENAME")
         ("e,csv-eval", "Use the csv file for evaluation", cxxopts::value<std::string>(), "FILENAME")
         ("csv-random", "Whether to choose lines in random order from the csv file", cxxopts::value<bool>()->default_value("true"), "true/false")
@@ -145,7 +148,7 @@ int main(int argc, char *argv[])
     if (result.count("blx-alpha"))
         constants.blxAlpha = result["blx-alpha"].as<double>();
 
-    bool isEnvironmentSpecified = (result.count("mux") || result.count("csv") || result.count("chk"));
+    bool isEnvironmentSpecified = (result.count("mux") || result.count("csv") || result.count("chk") || result.count("rchk") || result.count("func"));
 
     // Determine crossover method
     if (result["x-method"].as<std::string>() == "uniform")
@@ -353,6 +356,84 @@ int main(int argc, char *argv[])
         );
     }
 
+    // Use rotated checkerboard problem
+    if (result.count("rchk"))
+    {
+        if (!result.count("chk-div"))
+        {
+            std::cerr << "Error: The division in the checkerboard problem (--chk-div) is not specified." << std::endl;
+            exit(1);
+        }
+
+        std::vector<std::unique_ptr<RotatedCheckerboardEnvironment>> explorationEnvironments;
+        std::vector<std::unique_ptr<RotatedCheckerboardEnvironment>> exploitationEnvironments;
+        for (std::size_t i = 0; i < settings.seedCount; ++i)
+        {
+            explorationEnvironments.push_back(std::make_unique<RotatedCheckerboardEnvironment>(result["rchk"].as<int>(), result["chk-div"].as<int>()));
+            exploitationEnvironments.push_back(std::make_unique<RotatedCheckerboardEnvironment>(result["rchk"].as<int>(), result["chk-div"].as<int>()));
+        }
+
+        experimentHelper = std::make_unique<ExperimentHelper<XCSR<double, bool>, RotatedCheckerboardEnvironment>>(
+            settings,
+            constants,
+            std::move(explorationEnvironments),
+            std::move(exploitationEnvironments),
+            [](RotatedCheckerboardEnvironment &){},
+            [](RotatedCheckerboardEnvironment &){},
+            repr
+        );
+    }
+
+    // Use function problem
+    if (result.count("func"))
+    {
+        std::function<double(const std::vector<double> &)> func = [](const std::vector<double> &)
+        {
+            return 0.0;
+        };
+        switch (result["func"].as<int>())
+        {
+        case 1:
+            func = [](const std::vector<double> & input)
+            {
+                return static_cast<double>(static_cast<int>(input[0] * 3) % 3) / 3 + static_cast<double>(static_cast<int>(input[1] * 3) % 3) / 3;
+            };
+            break;
+        case 2:
+            func = [](const std::vector<double> & input)
+            {
+                return static_cast<double>(static_cast<int>((input[0] + input[1]) * 2) % 4) / 6;
+            };
+            break;
+        case 3:
+            func = [](const std::vector<double> & input)
+            {
+                return std::sin((input[0] + input[1]) * 2 * M_PI);
+            };
+            break;
+        default:
+            std::cerr << "Error: Unknown function is set in --func" << std::endl;
+        }
+
+        std::vector<std::unique_ptr<FunctionEnvironment>> explorationEnvironments;
+        std::vector<std::unique_ptr<FunctionEnvironment>> exploitationEnvironments;
+        for (std::size_t i = 0; i < settings.seedCount; ++i)
+        {
+            explorationEnvironments.push_back(std::make_unique<FunctionEnvironment>(func, 2));
+            exploitationEnvironments.push_back(std::make_unique<FunctionEnvironment>(func, 2));
+        }
+
+        experimentHelper = std::make_unique<ExperimentHelper<XCSR<double, int>, FunctionEnvironment>>(
+            settings,
+            constants,
+            std::move(explorationEnvironments),
+            std::move(exploitationEnvironments),
+            [](FunctionEnvironment &){},
+            [](FunctionEnvironment &){},
+            repr
+        );
+    }
+
     // Use csv file
     if (result.count("csv"))
     {
@@ -435,6 +516,26 @@ int main(int argc, char *argv[])
         if (os)
         {
             experimentHelper->dumpPopulation(0, os);
+        }
+    }
+
+    if (result.count("func"))
+    {
+        auto & experimentHelperRef = dynamic_cast<ExperimentHelper<XCSR<double, int>, FunctionEnvironment> &>(*experimentHelper);
+        auto & experiment = experimentHelperRef.experimentAt(0);
+
+        if (!result["func-output-pred"].as<std::string>().empty())
+        {
+            std::ofstream ofs(settings.outputFilenamePrefix + result["func-output-pred"].as<std::string>());
+            for (int y = 0; y < 100; ++y)
+            {
+                for (int x = 0; x < 100; ++x)
+                {
+                    experiment.exploit({ x / 100.0, y / 100.0 });
+                    ofs << experiment.predictionFor(0) << ',';
+                }
+                ofs << '\n';
+            }
         }
     }
 

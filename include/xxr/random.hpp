@@ -16,8 +16,6 @@ namespace xxr
     class Random
     {
     private:
-        static std::random_device m_device;
-
         static auto && device()
         {
             static std::random_device device;

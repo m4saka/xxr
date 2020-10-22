@@ -24,7 +24,7 @@ namespace xxr
         const bool m_chooseRandom;
         bool m_isEndOfProblem;
 
-        virtual void loadNext()
+        virtual std::size_t loadNext()
         {
             if (m_chooseRandom)
             {
@@ -32,16 +32,19 @@ namespace xxr
                 m_situation = m_dataset.situations[idx];
                 m_situationSigma = m_dataset.situationSigmas[idx];
                 m_answer = m_dataset.actions[idx];
+                return idx;
             }
             else
             {
                 m_situation = m_dataset.situations[m_nextIdx];
                 m_situationSigma = m_dataset.situationSigmas[m_nextIdx];
                 m_answer = m_dataset.actions[m_nextIdx];
+                const auto idx = m_nextIdx;
                 if (++m_nextIdx >= m_dataset.situations.size())
                 {
                     m_nextIdx = 0;
                 }
+                return idx;
             }
         }
 

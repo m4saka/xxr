@@ -23,7 +23,7 @@ namespace xxr { namespace xcsr_impl { namespace ubr
 
     protected:
         using xcs_impl::MatchSet<Population>::m_set;
-        using xcs_impl::MatchSet<Population>::m_constants;
+        using xcs_impl::MatchSet<Population>::m_pConstants;
         using xcs_impl::MatchSet<Population>::m_availableActions;
 
         // GENERATE COVERING CLASSIFIER
@@ -32,20 +32,20 @@ namespace xxr { namespace xcsr_impl { namespace ubr
             std::vector<SymbolType> symbols;
             for (auto && symbol : situation)
             {
-                double lowerMin = symbol - m_constants.coveringMaxSpread;
-                double upperMax = symbol + m_constants.coveringMaxSpread;
-                if (m_constants.doCoveringRandomRangeTruncation)
+                double lowerMin = symbol - m_pConstants->coveringMaxSpread;
+                double upperMax = symbol + m_pConstants->coveringMaxSpread;
+                if (m_pConstants->doCoveringRandomRangeTruncation)
                 {
-                    lowerMin = std::max(lowerMin, m_constants.minValue);
-                    upperMax = std::min(upperMax, m_constants.maxValue);
+                    lowerMin = std::max(lowerMin, m_pConstants->minValue);
+                    upperMax = std::min(upperMax, m_pConstants->maxValue);
                 }
 
                 double lower = Random::nextDouble(lowerMin, symbol);
                 double upper = Random::nextDouble(symbol, upperMax);
-                if (m_constants.doRangeRestriction)
+                if (m_pConstants->doRangeRestriction)
                 {
-                    lower = std::max(lower, m_constants.minValue);
-                    upper = std::min(upper, m_constants.maxValue);
+                    lower = std::max(lower, m_pConstants->minValue);
+                    upper = std::min(upper, m_pConstants->maxValue);
                 }
 
                 if (Random::nextDouble() < 0.5)
@@ -58,18 +58,18 @@ namespace xxr { namespace xcsr_impl { namespace ubr
                 }
             }
 
-            return std::make_shared<StoredClassifierType>(symbols, Random::chooseFrom(unselectedActions), timeStamp, m_constants);
+            return std::make_shared<StoredClassifierType>(symbols, Random::chooseFrom(unselectedActions), timeStamp, m_pConstants);
         }
 
     public:
         // Constructor
-        MatchSet(ConstantsType & constants, const std::unordered_set<ActionType> & availableActions)
-            : xcs_impl::MatchSet<Population>(constants, availableActions)
+        MatchSet(const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions)
+            : xcs_impl::MatchSet<Population>(pConstants, availableActions)
         {
         }
 
-        MatchSet(Population & population, const std::vector<type> & situation, uint64_t timeStamp, ConstantsType & constants, const std::unordered_set<ActionType> & availableActions)
-            : MatchSet(constants, availableActions)
+        MatchSet(Population & population, const std::vector<type> & situation, uint64_t timeStamp, const ConstantsType *pConstants, const std::unordered_set<ActionType> & availableActions)
+            : MatchSet(pConstants, availableActions)
         {
             this->regenerate(population, situation, timeStamp);
         }

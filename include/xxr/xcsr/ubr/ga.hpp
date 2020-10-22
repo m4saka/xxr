@@ -24,7 +24,7 @@ namespace xxr { namespace xcsr_impl { namespace ubr
         using typename xcsr_impl::GA<Population>::PopulationType;
 
     protected:
-        using xcsr_impl::GA<Population>::m_constants;
+        using xcsr_impl::GA<Population>::m_pConstants;
         using xcsr_impl::GA<Population>::m_availableActions;
 
         // APPLY CROSSOVER (uniform crossover)
@@ -110,13 +110,13 @@ namespace xxr { namespace xcsr_impl { namespace ubr
             {
                 double p1 = cl1.condition[i].p;
                 double p2 = cl2.condition[i].p;
-                cl1.condition[i].p = p1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (p2 - p1);
-                cl2.condition[i].p = p1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (p2 - p1);
+                cl1.condition[i].p = p1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (p2 - p1);
+                cl2.condition[i].p = p1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (p2 - p1);
 
                 double q1 = cl1.condition[i].q;
                 double q2 = cl2.condition[i].q;
-                cl1.condition[i].q = q1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (q2 - q1);
-                cl2.condition[i].q = q1 + Random::nextDouble(-m_constants.blxAlpha, 1.0 + m_constants.blxAlpha) * (q2 - q1);
+                cl1.condition[i].q = q1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (q2 - q1);
+                cl2.condition[i].q = q1 + Random::nextDouble(-m_pConstants->blxAlpha, 1.0 + m_pConstants->blxAlpha) * (q2 - q1);
             }
 
             return true;
@@ -130,28 +130,28 @@ namespace xxr { namespace xcsr_impl { namespace ubr
             // Mutate p or q
             for (std::size_t i = 0; i < cl.condition.size(); ++i)
             {
-                if (Random::nextDouble() < m_constants.mu)
+                if (Random::nextDouble() < m_pConstants->mu)
                 {
                     if (Random::nextDouble() < 0.5)
                     {
-                        cl.condition[i].p += Random::nextDouble(-m_constants.mutationMaxChange, m_constants.mutationMaxChange);
-                        if (m_constants.doRangeRestriction)
+                        cl.condition[i].p += Random::nextDouble(-m_pConstants->mutationMaxChange, m_pConstants->mutationMaxChange);
+                        if (m_pConstants->doRangeRestriction)
                         {
-                            cl.condition[i].p = std::min(std::max(m_constants.minValue, cl.condition[i].p), m_constants.maxValue);
+                            cl.condition[i].p = std::min(std::max(m_pConstants->minValue, cl.condition[i].p), m_pConstants->maxValue);
                         }
                     }
                     else
                     {
-                        cl.condition[i].q += Random::nextDouble(-m_constants.mutationMaxChange, m_constants.mutationMaxChange);
-                        if (m_constants.doRangeRestriction)
+                        cl.condition[i].q += Random::nextDouble(-m_pConstants->mutationMaxChange, m_pConstants->mutationMaxChange);
+                        if (m_pConstants->doRangeRestriction)
                         {
-                            cl.condition[i].q = std::min(std::max(m_constants.minValue, cl.condition[i].q), m_constants.maxValue);
+                            cl.condition[i].q = std::min(std::max(m_pConstants->minValue, cl.condition[i].q), m_pConstants->maxValue);
                         }
                     }
                 }
             }
 
-            if (m_constants.doActionMutation && (Random::nextDouble() < m_constants.mu) && (m_availableActions.size() >= 2))
+            if (m_pConstants->doActionMutation && (Random::nextDouble() < m_pConstants->mu) && (m_availableActions.size() >= 2))
             {
                 std::unordered_set<ActionType> otherPossibleActions(m_availableActions);
                 otherPossibleActions.erase(cl.action);

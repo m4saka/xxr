@@ -22,7 +22,7 @@ namespace xxr { namespace xcs_impl
 
     protected:
         using ClassifierPtrSet::m_set;
-        using ClassifierPtrSet::m_constants;
+        using ClassifierPtrSet::m_pConstants;
         using ClassifierPtrSet::m_availableActions;
 
         // DELETION VOTE
@@ -31,7 +31,7 @@ namespace xxr { namespace xcs_impl
             double vote = cl.actionSetSize * cl.numerosity;
 
             // Consider fitness for deletion vote
-            if ((cl.experience >= m_constants.thetaDel) && (cl.fitness / cl.numerosity < m_constants.delta * averageFitness))
+            if ((cl.experience >= m_pConstants->thetaDel) && (cl.fitness / cl.numerosity < m_pConstants->delta * averageFitness))
             {
                 vote *= averageFitness / (cl.fitness / cl.numerosity);
             }
@@ -72,7 +72,7 @@ namespace xxr { namespace xcs_impl
             }
 
             // Return false if the sum of numerosity has not met its maximum limit
-            if (numerositySum <= m_constants.n)
+            if (numerositySum <= m_pConstants->n)
             {
                 return false;
             }
@@ -105,7 +105,7 @@ namespace xxr { namespace xcs_impl
                 m_set.erase(*targets[selectedIdx]);
             }
 
-            return (numerositySum - 1) > m_constants.n;
+            return (numerositySum - 1) > m_pConstants->n;
         }
     };
 
