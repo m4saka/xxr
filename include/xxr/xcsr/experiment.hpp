@@ -56,7 +56,12 @@ namespace xxr { namespace xcsr_impl
         // Run with exploration
         virtual Action explore(const std::vector<T> & situation) override
         {
-            return m_experiment->explore(situation);
+            std::cout << "Error: Deleted function xcsr_impl::Experiment::exploit is called!" << std::endl;
+            std::exit(1);
+        }
+        virtual Action explore(const std::vector<T> & situation, const std::vector<T> & situationSigma) override
+        {
+            return m_experiment->explore(situation, situationSigma);
         }
 
         virtual void reward(double value, bool isEndOfProblem = true) override

@@ -68,6 +68,11 @@ namespace xxr { namespace xcsr_impl { namespace obr
         virtual ~Experiment() = default;
 
         using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::explore;
+        virtual Action explore(const std::vector<T> & situation, const std::vector<T> & situationSigma)
+        {
+            std::cout << "AbstractExperiment::explore(const std::vector<T> &, const std::vector<T> &) is not implemented!" << std::endl;
+            std::exit(1);
+        }
         using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::reward;
         using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::exploit;
 

@@ -42,6 +42,20 @@ namespace xxr { namespace xcsr_impl { namespace csr
     >
     class Experiment : public xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>
     {
+    protected:
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_population;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_timeStamp;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_availableActions;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_isCoveringPerformed;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_prediction;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_predictions;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_actionSet;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_expectsReward;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_isPrevModeExplore;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_prevActionSet;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_prevReward;
+        using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::m_prevSituation;
+
     public:
         using typename xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::type;
         using typename xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::SymbolType;
@@ -68,6 +82,49 @@ namespace xxr { namespace xcsr_impl { namespace csr
         virtual ~Experiment() = default;
 
         using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::explore;
+
+        // Run with exploration
+        virtual Action explore(const std::vector<T> & situation) override
+        {
+            std::cout << "Error: Deleted function xcsr_impl::csr::Experiment::explore is called!" << std::endl;
+            std::exit(1);
+        }
+        virtual Action explore(const std::vector<T> & situation, const std::vector<T> & situationSigma) override
+        {
+            assert(!m_expectsReward);
+
+            // [M]
+            //   The match set [M] is formed out of the current [P].
+            //   It includes all classifiers that match the current situation.
+            const MatchSetType matchSet(m_population, situation, situationSigma/* <- This is the only change here */, m_timeStamp, &this->constants, m_availableActions);
+            m_isCoveringPerformed = matchSet.isCoveringPerformed();
+
+            const PredictionArray predictionArray(matchSet, &this->constants, this->constants.exploreProbability);
+
+            const Action action = predictionArray.selectAction();
+            m_prediction = predictionArray.predictionFor(action);
+            for (const auto & action : m_availableActions)
+            {
+                m_predictions[action] = predictionArray.predictionFor(action);
+            }
+
+            m_actionSet.regenerate(matchSet, action);
+
+            m_expectsReward = true;
+            m_isPrevModeExplore = true;
+
+            if (!m_prevActionSet.empty())
+            {
+                double p = m_prevReward + constants.gamma * predictionArray.max();
+                m_prevActionSet.update(p, m_population);
+                m_prevActionSet.runGA(m_prevSituation, m_population, m_timeStamp);
+            }
+
+            m_prevSituation = situation;
+
+            return action;
+        }
+
         using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::reward;
         using xcs_impl::Experiment<T, Action, PredictionArray, ActionSet>::exploit;
 

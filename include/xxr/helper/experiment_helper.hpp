@@ -75,12 +75,12 @@ namespace xxr
 
         virtual typename Experiment::ActionType callExperimentExploit(std::size_t idx)
         {
-            return m_experiments[idx]->exploit(m_exploitationEnvironments[idx]->situation(), m_settings.updateInExploitation);
+            return m_experiments[idx]->exploit(m_exploitationEnvironments[idx]->situation(), m_exploitationEnvironments[idx]->situationSigma(), m_settings.updateInExploitation);
         }
 
         virtual typename Experiment::ActionType callExperimentExplore(std::size_t idx)
         {
-            return m_experiments[idx]->explore(m_explorationEnvironments[idx]->situation());
+            return m_experiments[idx]->explore(m_explorationEnvironments[idx]->situation(), m_exploitationEnvironments[idx]->situationSigma());
         }
 
         virtual void runExploitationIteration()
