@@ -1,11 +1,9 @@
-# Notice: Our next project of XCS library is available!
+# DEPRECATED: Our next project of XCS library is available
 Newer project => [m4saka/xcspp](https://github.com/m4saka/xcspp)
 - Changes from xxr:
     - Much simpler code (w/o complex C++ template)
     - Not using non-thread-safe random utility
     - Using exception instead of C-style assertion
-- XCSR has not been implemented yet.
-- The command-line tool is not yet available.
 
 --------
 
