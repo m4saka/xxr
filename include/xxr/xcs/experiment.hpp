@@ -335,6 +335,16 @@ namespace xxr { namespace xcs_impl
             setPopulation(population, !useAsInitialPopulation);
         }
 
+        virtual PopulationType & population()
+        {
+            return m_population;
+        }
+
+        virtual const PopulationType & population() const
+        {
+            return m_population;
+        }
+
         virtual void setPopulation(const std::vector<ClassifierType> & classifiers, bool initTimeStamp = true)
         {
             // Replace population
