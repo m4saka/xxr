@@ -106,6 +106,10 @@ namespace xxr
         Dataset<T, Action> readDataset(const std::string & filename, bool rounds = false)
         {
             std::ifstream ifs(filename);
+            if (!ifs.good())
+            {
+                throw new std::runtime_error("Error: Cannot open file '" + filename + "'");
+            }
             return readDataset<T, Action>(ifs, rounds);
         }
 
@@ -212,6 +216,10 @@ namespace xxr
         std::vector<Classifier> readPopulation(const std::string & filename, bool skipFirstLine = true, bool skipFirstColumn = false)
         {
             std::ifstream ifs(filename);
+            if (!ifs.good())
+            {
+                throw new std::runtime_error("Error: Cannot open file '" + filename + "'");
+            }
             return readPopulation<Classifier>(ifs, skipFirstLine, skipFirstColumn);
         }
     }
